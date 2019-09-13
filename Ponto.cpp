@@ -10,6 +10,12 @@ class Ponto {
         list<float> cor;
 
     public:
+        Ponto() {
+            this->x = 0;
+            this->y = 0;
+            this->z = 0;
+        }
+        
         Ponto(double x, double y, double z) {
             this->x = x;
             this->y = y;

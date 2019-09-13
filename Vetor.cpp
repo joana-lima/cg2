@@ -1,14 +1,14 @@
 #include<iostream>
+#include<math.h>
 #include "Ponto.cpp"
 using namespace std;
 
 class Vetor: public Ponto {
     public:
-
+    Vetor(): Ponto() {}
     Vetor(double x, double y, double z) : Ponto(x,y,z){}
 
     Vetor *soma(Vetor vetor) {
-
         double XNovo, YNovo, ZNovo;
         XNovo = this->x + vetor.getX();
         YNovo = this->y + vetor.getY();
@@ -17,9 +17,33 @@ class Vetor: public Ponto {
         return resultado;
     }
 
+    double produtoEscalar(Vetor vetor){
+        double resultado;
+        resultado = (this->x*vetor.getX()) + (this->y*vetor.getY()) + (this->z*vetor.getZ());
+        return resultado;
+    }
+
+    Vetor *multEscalar(double escalar) {  //Multiplicaçao de um vetor por um escalar
+        double novoX, novoY, novoZ;
+        novoX = this->x*escalar;
+        novoY = this->y*escalar;
+        novoZ = this->z*escalar;
+        Vetor *resultado = new Vetor(novoX, novoY, novoZ);
+        return resultado;
+    }
+
+    double calcularNorma() {
+        double norma = sqrt(this->produtoEscalar(*this));
+        return norma;
+    }
+
+    Vetor *normalizar() {
+        double norma = this->calcularNorma();
+        Vetor *novoVetor = this->multEscalar(1/norma);
+        return novoVetor;
+    }
+    
     void printCoordenadas() {
-        cout << this->x << endl;
-        cout << this->y << endl;
-        cout << this->z << endl;
+        cout << "Vetor - X: " << this->x <<", Y: " << this->y << ",Z: " << this->z;
     }
 };
