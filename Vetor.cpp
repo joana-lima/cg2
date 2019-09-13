@@ -8,15 +8,6 @@ class Vetor: public Ponto {
     Vetor(): Ponto() {}
     Vetor(double x, double y, double z) : Ponto(x,y,z){}
 
-    Vetor *soma(Vetor vetor) {
-        double XNovo, YNovo, ZNovo;
-        XNovo = this->x + vetor.getX();
-        YNovo = this->y + vetor.getY();
-        ZNovo = this->z + vetor.getZ();
-        Vetor *resultado = new Vetor(XNovo, YNovo, ZNovo);
-        return resultado;
-    }
-
     double produtoEscalar(Vetor vetor){
         double resultado;
         resultado = (this->x*vetor.getX()) + (this->y*vetor.getY()) + (this->z*vetor.getZ());
@@ -53,5 +44,13 @@ class Vetor: public Ponto {
          res.y = y + obj.y;
          res.z = z + obj.z;
          return res; 
+    }
+
+    Vetor operator - (Vetor const &obj) {
+        Vetor res;
+        res.x = x - obj.x;
+        res.y = y - obj.y;
+        res.z = z - obj.z;
+        return res;
     }
 };
