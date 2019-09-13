@@ -1,5 +1,4 @@
 .vscode
-a.exe
-main.bin
-a.out
-main.out
+*.exe
+*.out
+*.bin
