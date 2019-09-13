@@ -1,6 +1,7 @@
 #include<iostream>
 #include<math.h>
 #include "Ponto.cpp"
+
 using namespace std;
 
 class Vetor: public Ponto {
@@ -16,9 +17,9 @@ class Vetor: public Ponto {
 
     Vetor *multEscalar(double escalar) {  //Multiplicaçao de um vetor por um escalar
         double novoX, novoY, novoZ;
-        novoX = this->x*escalar;
-        novoY = this->y*escalar;
-        novoZ = this->z*escalar;
+        novoX = this->x * escalar;
+        novoY = this->y * escalar;
+        novoZ = this->z * escalar;
         Vetor *resultado = new Vetor(novoX, novoY, novoZ);
         return resultado;
     }
@@ -39,11 +40,11 @@ class Vetor: public Ponto {
     }
 
     Vetor operator + (Vetor const &obj) { 
-         Vetor res; 
-         res.x = x + obj.x; 
-         res.y = y + obj.y;
-         res.z = z + obj.z;
-         return res; 
+        Vetor res; 
+        res.x = x + obj.x; 
+        res.y = y + obj.y;
+        res.z = z + obj.z;
+        return res; 
     }
 
     Vetor operator - (Vetor const &obj) {
@@ -52,5 +53,23 @@ class Vetor: public Ponto {
         res.y = y - obj.y;
         res.z = z - obj.z;
         return res;
+    }
+
+    Vetor *produtoVetorial(Vetor vetor){
+        Vetor *vetorUnitI = new Vetor(1.0, 0.0, 0.0);
+        Vetor *vetorUnitJ = new Vetor(0.0, 1.0, 0.0);
+        Vetor *vetorUnitK = new Vetor(0.0, 0.0, 1.0);
+
+        double xVetor = vetor.getX();
+        double yVetor = vetor.getY();
+        double zVetor = vetor.getZ();
+
+        Vetor *diagonalPrincipal = new Vetor;
+        *diagonalPrincipal = *vetorUnitI->multEscalar(this->y * zVetor) + *vetorUnitJ->multEscalar(this->z * xVetor) + *vetorUnitK->multEscalar(this->x * yVetor);
+        Vetor *diagonalSecundaria = new Vetor;
+        *diagonalSecundaria = *vetorUnitK->multEscalar(this->y * xVetor) + *vetorUnitI->multEscalar(this->z * yVetor) + *vetorUnitJ->multEscalar(this->x * zVetor);
+        Vetor *resultado = new Vetor(diagonalPrincipal->getX() - diagonalSecundaria->getX(), diagonalPrincipal->getY() - diagonalSecundaria->getY(), diagonalPrincipal->getZ() - diagonalSecundaria->getZ());
+        
+        return resultado;
     }
 };
