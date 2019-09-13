@@ -34,7 +34,7 @@ class Vetor: public Ponto {
         return novoVetor;
     }
     
-    void printCoordenadas() {
+    void print() {
         cout << "Vetor - X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n";
     }
 

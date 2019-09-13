@@ -9,9 +9,9 @@ int main() {
 
     // **********INICIO TESTE DA CLASSE VETOR***************
 
-    cout << "-----------Teste printCoordenadas------------" << endl;
-    vetor1->printCoordenadas();
-    vetor2->printCoordenadas();
+    cout << "-----------Teste print------------" << endl;
+    vetor1->print();
+    vetor2->print();
 
     cout << "------------Teste Produto Escalar------------" << endl;
     resultado = vetor1->produtoEscalar(*vetor2);
@@ -19,9 +19,9 @@ int main() {
 
     cout << "------------Teste Multiplicação por Escalar-----------" << endl;
     vetor3 = vetor2->multEscalar(4);
-    vetor3->printCoordenadas();
+    vetor3->print();
     vetor3 = vetor2->multEscalar(0);
-    vetor3->printCoordenadas();
+    vetor3->print();
     
     cout << "--------------Teste Cálculo da Norma------------" << endl;
     resultado = vetor1->calcularNorma();
@@ -32,15 +32,15 @@ int main() {
     cout << "--------------Teste Normalizar----------" << endl;
     Vetor *vetor4 = new Vetor(4,2,8);
     vetor4 = vetor4->normalizar();
-    vetor4->printCoordenadas();
+    vetor4->print();
 
     cout << "---------------Teste do operador + --------------- " << endl;
     *vetor3 = *vetor1 + *vetor2;
-    vetor3->printCoordenadas();
+    vetor3->print();
 
     cout << "---------------Teste do operador - ----------------" << endl;
     *vetor3 = *vetor1 - *vetor2;
-    vetor3->printCoordenadas();
+    vetor3->print();
 
 
     //****************FIM TESTES DA CLASSE VETOR******************
