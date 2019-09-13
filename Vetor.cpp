@@ -44,6 +44,14 @@ class Vetor: public Ponto {
     }
     
     void printCoordenadas() {
-        cout << "Vetor - X: " << this->x <<", Y: " << this->y << ",Z: " << this->z;
+        cout << "Vetor - X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n";
+    }
+
+    Vetor operator + (Vetor const &obj) { 
+         Vetor res; 
+         res.x = x + obj.x; 
+         res.y = y + obj.y;
+         res.z = z + obj.z;
+         return res; 
     }
 };
