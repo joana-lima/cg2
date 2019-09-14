@@ -6,6 +6,9 @@ int main() {
     Vetor *vetor1 = new Vetor(1,1,1);   //Vetores para testes
     Vetor *vetor2 = new Vetor(2,2,2);
     Vetor *vetor3;
+    Vetor *vetor4;
+    Vetor *vetor5 = new Vetor(1,2,0);
+    Vetor *vetor6 = new Vetor(3,-2,0);
 
     // **********INICIO TESTE DA CLASSE VETOR***************
 
@@ -30,7 +33,7 @@ int main() {
 
 
     cout << "--------------Teste Normalizar----------" << endl;
-    Vetor *vetor4 = new Vetor(4,2,8);
+    vetor4 = new Vetor(4,2,8);
     vetor4 = vetor4->normalizar();
     vetor4->print();
 
@@ -42,8 +45,14 @@ int main() {
     *vetor3 = *vetor1 - *vetor2;
     vetor3->print();
 
+    cout << "---------------Teste do operador * (produto escalar)---------" << endl;
+    resultado = *vetor1 * *vetor2;
+    cout << "produto escalar: " << resultado << endl;
+
+    cout << "-----------Teste Produto Vetorial------------------" << endl;
+    vetor3 = vetor5->produtoVetorial(*vetor6);
+    vetor3->print();
 
     //****************FIM TESTES DA CLASSE VETOR******************
-
     return 0;
 }

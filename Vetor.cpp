@@ -36,7 +36,7 @@ class Vetor: public Ponto {
     }
     
     void print() {
-        cout << "Vetor - X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n";
+        cout << "Vetor X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n";
     }
 
     Vetor operator + (Vetor const &obj) { 
@@ -53,6 +53,12 @@ class Vetor: public Ponto {
         res.y = y - obj.y;
         res.z = z - obj.z;
         return res;
+    }
+
+    double operator * (Vetor const &obj) {
+        double resultado;
+        resultado = x*obj.x + y*obj.y + z*obj.z;
+        return resultado;
     }
 
     Vetor *produtoVetorial(Vetor vetor){
