@@ -26,7 +26,7 @@ class Reta {
     }
 
     Ponto *pontoAtingido(double k) {
-        Ponto *atingido = somaPontoVetor(this->ponto, this->vetor);
+        Ponto *atingido = somaPontoVetor(this->ponto, *(this->vetor.multEscalar(k)));
         return atingido;
     }
 };

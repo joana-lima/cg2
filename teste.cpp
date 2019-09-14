@@ -62,7 +62,11 @@ int main() {
     Reta *reta1 = new Reta(*ponto1, *vetor7);
     reta1->print();
 
-    cout << "---------Teste do ponto atingido" << endl;
-    
-    return 0;
+    cout << "---------Teste do ponto atingido-------" << endl;
+    Ponto *ponto2 = reta1->pontoAtingido(3);
+    ponto2->print();
+
+    /*int c = reta1->minhaSoma(2,3);
+    cout << c;
+    return 0;*/
 }
