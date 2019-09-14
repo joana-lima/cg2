@@ -77,5 +77,7 @@ int main() {
     Ponto *ponto4 = new Ponto(1,4,0);
     bool teste = meuplano->pertencePlano(*ponto4);
     cout << teste << endl;
+
+    cout << "---------Teste da interseção raio-plano----" << endl; //Por fazer.
     
 }

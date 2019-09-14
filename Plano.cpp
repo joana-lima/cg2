@@ -8,7 +8,7 @@ class Plano {
     public:
     Plano(Ponto ponto, Vetor normal) {
         this->ponto = ponto;
-        this->normal = normal; 
+        this->normal = normal;
     }
 
     Ponto *getPonto() {
@@ -24,5 +24,20 @@ class Plano {
         double resultado = *distancia * (this->normal);
         if(resultado == 0)      return true;
         else                    return false;   
+    }
+
+    list<Ponto> intRay(Reta reta) {
+        list<Ponto> pontos;
+        double temp = this->normal * (*reta.getVetor());
+        if(temp == 0) {
+            return pontos;
+        }
+        else {
+            Vetor *vetor = vetorDistancia(*reta.getPonto(),this->ponto);
+            double numerador = *vetor * this->normal;
+            double tInt = numerador/temp;
+            pontos.push_front(*reta.pontoAtingido(tInt));
+            return pontos;
+        }
     }
 };
