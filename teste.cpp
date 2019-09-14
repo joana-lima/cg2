@@ -1,14 +1,16 @@
-#include "Vetor.cpp"
+#include "Reta.cpp"
 
 int main() {
 
     double resultado;                    //Escalar qualquer
+    Ponto *ponto1 = new Ponto(1,1,1);
     Vetor *vetor1 = new Vetor(1,1,1);   //Vetores para testes
     Vetor *vetor2 = new Vetor(2,2,2);
     Vetor *vetor3;
     Vetor *vetor4;
     Vetor *vetor5 = new Vetor(1,2,0);
     Vetor *vetor6 = new Vetor(3,-2,0);
+    Vetor *vetor7 = new Vetor(0,0,1);
 
     // **********INICIO TESTE DA CLASSE VETOR***************
 
@@ -54,5 +56,13 @@ int main() {
     vetor3->print();
 
     //****************FIM TESTES DA CLASSE VETOR******************
+    
+    //****************TESTES DA CLASSE RETA***********************
+    cout << "---------Teste de instanciação da reta e print------------------" << endl;
+    Reta *reta1 = new Reta(*ponto1, *vetor7);
+    reta1->print();
+
+    cout << "---------Teste do ponto atingido" << endl;
+    
     return 0;
 }

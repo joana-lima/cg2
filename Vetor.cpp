@@ -36,7 +36,7 @@ class Vetor: public Ponto {
     }
     
     void print() {
-        cout << "Vetor X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n";
+        cout << "Vetor X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n" << endl;
     }
 
     Vetor operator + (Vetor const &obj) { 

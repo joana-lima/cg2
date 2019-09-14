@@ -57,4 +57,8 @@ class Ponto {
         void setCor(float red, float green, float blue) {
             this->cor = {red, green, blue};
         }
+
+        void print() {
+            cout << "Ponto X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n" << endl;
+        }
 };

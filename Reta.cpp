@@ -1,5 +1,4 @@
-#include "Vetor.cpp"
-#include<iostream>
+#include "matematica.hpp"
 
 class Reta {
     protected:
@@ -18,5 +17,16 @@ class Reta {
 
     Vetor getVetor() {
         return this->vetor;
+    }
+
+    void print() {
+        cout << "----Reta----" << endl;
+        ponto.print();
+        vetor.print();
+    }
+
+    Ponto *pontoAtingido(double k) {
+        Ponto *atingido = somaPontoVetor(this->ponto, this->vetor);
+        return atingido;
     }
 };
