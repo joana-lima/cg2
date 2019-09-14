@@ -11,12 +11,12 @@ class Reta {
         this->vetor = vetor;
     }
 
-    Ponto getPonto() {
-        return this->ponto;
+    Ponto *getPonto() {
+        return &this->ponto;
     }
 
-    Vetor getVetor() {
-        return this->vetor;
+    Vetor *getVetor() {
+        return &this->vetor;
     }
 
     void print() {

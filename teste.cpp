@@ -1,9 +1,12 @@
 #include "Reta.cpp"
+#include "Plano.cpp"
 
 int main() {
 
     double resultado;                    //Escalar qualquer
     Ponto *ponto1 = new Ponto(1,1,1);
+    Ponto *ponto2;
+    Ponto *ponto3 = new Ponto(3,-2, 0);
     Vetor *vetor1 = new Vetor(1,1,1);   //Vetores para testes
     Vetor *vetor2 = new Vetor(2,2,2);
     Vetor *vetor3;
@@ -63,10 +66,16 @@ int main() {
     reta1->print();
 
     cout << "---------Teste do ponto atingido-------" << endl;
-    Ponto *ponto2 = reta1->pontoAtingido(3);
+    ponto2 = reta1->pontoAtingido(3);
     ponto2->print();
 
-    /*int c = reta1->minhaSoma(2,3);
-    cout << c;
-    return 0;*/
+    //***************FIM DOS TESTES DA CLASSE RETA*******************
+
+    //***************INICIO TESTES CLASSE PLANO**********************
+    cout << "----------Teste do pertencePlano----------------" << endl;
+    Plano *meuplano = new Plano(*ponto3, *vetor7);
+    Ponto *ponto4 = new Ponto(1,4,0);
+    bool teste = meuplano->pertencePlano(*ponto4);
+    cout << teste << endl;
+    
 }
