@@ -1,6 +1,4 @@
-#include "Reta.cpp"
-#include "Plano.cpp"
-#include "Objeto.cpp"
+#include "Objetos.cpp"
 
 using namespace std;
 
