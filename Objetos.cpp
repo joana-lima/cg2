@@ -27,6 +27,10 @@ class Ponto {
             this->id++;
         }
 
+        int getID() {
+            return this->id;
+        }
+
         double getX() {
             return this->x;
         }
@@ -60,7 +64,7 @@ class Ponto {
         }
 
         void print() {
-            cout << "Ponto X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n" << endl;
+            cout << "Ponto X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << endl;
         }
 };
 
@@ -166,12 +170,12 @@ list<double> equacaoSegundoGrau(double a, double b, double c) {
         return escalares;
     else {
         x1 = -b + sqrt(delta)/2*a;
-        escalares.push_front(x1);
+        escalares.push_back(x1);
         if(delta == 0)
             return escalares;
         else {
             x2 = -b - sqrt(delta)/2*a;
-            escalares.push_front(x2);
+            escalares.push_back(x2);
             return escalares;
         }
     }
@@ -196,6 +200,30 @@ class Objeto {
 
         void print(){
             cout << "Objeto - ID: " << this->id <<endl;
+
+            cout << "Vertices: " << endl;
+            for (list<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
+                i->print();
+            }
+            cout << endl;
+
+            cout << "Arestas: " << endl << "[\n";
+            for (list<list<Ponto>>::iterator i = arestas.begin(); i != arestas.end(); ++i){
+
+                cout << "[";
+
+                list<Ponto>& ponteiroParaPonto = *i;
+
+                for(list<Ponto>::iterator j = ponteiroParaPonto.begin(); j != ponteiroParaPonto.end(); j++){
+                    cout << " ";
+                    j->print();
+                    cout << " ";
+                }
+
+                cout << "]\n";
+            }
+            cout << "]" << endl;
+            
         }
 
         bool getVisibilidade(){
@@ -207,15 +235,15 @@ class Objeto {
         }
 
         void adicionarVertice(Ponto vertice){
-            this->vertices.push_front(vertice);
+            this->vertices.push_back(vertice);
         }
 
         void adicionarAresta(Ponto vertice1, Ponto vertice2){
-            this->arestas.push_front({vertice1, vertice2});
+            this->arestas.push_back({vertice1, vertice2});
         }
 
         void adicionarFace(Ponto vertice1, Ponto vertice2, Ponto vertice3){
-            this->faces.push_front({vertice1, vertice2, vertice3});
+            this->faces.push_back({vertice1, vertice2, vertice3});
         }
 
         list<Ponto> getVertices(){
@@ -299,7 +327,7 @@ class Plano {
             Vetor *vetor = vetorDistancia(*reta.getPonto(),this->ponto);
             double numerador = *vetor * this->normal;
             double tInt = numerador/temp;
-            pontos.push_front(*reta.pontoAtingido(tInt));
+            pontos.push_back(*reta.pontoAtingido(tInt));
             return pontos;
         }
     }
