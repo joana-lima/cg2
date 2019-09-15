@@ -89,32 +89,32 @@ int main() {
         i->print();
     }
     
-    cout << "---------Teste de Objeto-------------------" << endl;
-    Objeto *obj1 = new Objeto();
-    Ponto *v1 = new Ponto(0, 0, 0);
-    Ponto *v2 = new Ponto(1, 0, 0);
-    Ponto *v3 = new Ponto(0, 1, 0);
-    Ponto *v4 = new Ponto(0, 0, 1);
+    // cout << "---------Teste de Objeto-------------------" << endl;
+    // Objeto *obj1 = new Objeto();
+    // Ponto *v1 = new Ponto(0, 0, 0);
+    // Ponto *v2 = new Ponto(1, 0, 0);
+    // Ponto *v3 = new Ponto(0, 1, 0);
+    // Ponto *v4 = new Ponto(0, 0, 1);
 
-    obj1->adicionarVertice(*v1);
-    obj1->adicionarVertice(*v2);
-    obj1->adicionarVertice(*v3);
-    obj1->adicionarVertice(*v4);
+    // obj1->adicionarVertice(*v1);
+    // obj1->adicionarVertice(*v2);
+    // obj1->adicionarVertice(*v3);
+    // obj1->adicionarVertice(*v4);
 
-    list<Ponto> vertices = obj1->getVertices();
-    for (int i = 0; i < vertices.size(); i++)
-    {  
-        cout << "Vertices: " << &(vertices.begin())+i*sizeof(Ponto) << endl;
-    }
+    // list<Ponto> vertices = obj1->getVertices();
+    // for (int i = 0; i < vertices.size(); i++)
+    // {  
+    //     cout << "Vertices: " << &(vertices.begin())+i*sizeof(Ponto) << endl;
+    // }
 
-    obj1->adicionarAresta(*v1, *v2);
-    obj1->adicionarAresta(*v1, *v3);
-    obj1->adicionarAresta(*v1, *v4);
-    obj1->adicionarAresta(*v2, *v3);
-    obj1->adicionarAresta(*v3, *v4);
-    obj1->adicionarAresta(*v4, *v2);
+    // obj1->adicionarAresta(*v1, *v2);
+    // obj1->adicionarAresta(*v1, *v3);
+    // obj1->adicionarAresta(*v1, *v4);
+    // obj1->adicionarAresta(*v2, *v3);
+    // obj1->adicionarAresta(*v3, *v4);
+    // obj1->adicionarAresta(*v4, *v2);
 
-    list<list<Ponto>> arestas = obj1->getArestas();
-    cout << "Arestas: " << endl; //TODO
+    // list<list<Ponto>> arestas = obj1->getArestas();
+    // cout << "Arestas: " << endl; //TODO
 
 }
