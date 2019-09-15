@@ -108,5 +108,10 @@ int main() {
     obj1->adicionarAresta(*v3, *v4);
     obj1->adicionarAresta(*v4, *v2);
 
+    obj1->adicionarFace(*v1, *v3, *v2);
+    obj1->adicionarFace(*v1, *v3, *v4);
+    obj1->adicionarFace(*v1, *v4, *v2);
+    obj1->adicionarFace(*v2, *v3, *v4);
+
     obj1->print();
 }

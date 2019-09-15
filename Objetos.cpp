@@ -223,6 +223,22 @@ class Objeto {
                 cout << "]\n";
             }
             cout << "]" << endl;
+
+            cout << "\nfaces: " << endl << "[\n";
+            for (list<list<Ponto>>::iterator i = faces.begin(); i != faces.end(); ++i){
+
+                cout << "[";
+
+                list<Ponto>& ponteiroParaPonto = *i;
+
+                for(list<Ponto>::iterator j = ponteiroParaPonto.begin(); j != ponteiroParaPonto.end(); j++){
+                    cout << " ";
+                    j->print();
+                }
+
+                cout << "]\n";
+            }
+            cout << "]" << endl;
             
         }
 
