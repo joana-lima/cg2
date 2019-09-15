@@ -341,6 +341,50 @@ class Cilindro {
         return this->altura;
     }
 
+    list<Ponto> intRay(Reta reta) {
+        list<Ponto> pontosAtingidos;
+
+        //Vetor v
+        Vetor *bPo = vetorDistancia(this->base,*reta.getPonto()); //(Po - B)
+        double aux = (*bPo * this->normal);                       //(Po - B).u  
+        Vetor *vetorAux = this->normal.multEscalar(aux);          //((Po - B).u).u
+        Vetor v = *bPo - *vetorAux;                               //Vetor v
+
+        //Vetor w
+         double meuEscalar = *reta.getVetor() * this->normal;
+         vetorAux = this->normal.multEscalar(meuEscalar);
+         Vetor w = *reta.getVetor() -  *vetorAux;
+
+        //Cálculo dos coeficientes da equação do segundo grau.
+        double a = w * w;
+        double b = v * w;
+        double c = v * v - this->raio * this-> raio;
+
+        list<double> escalares = equacaoSegundoGrau(a,2*b,c);
+
+        //Obtendo lista de pontos Atingidos
+        list<double>::iterator i;
+        aux = 0;
+        Ponto p;
+        Vetor bP;
+        double meuTeste;
+        for(i=escalares.begin(); i != escalares.end(); i++) {
+            //Testando validade dos pontos.
+            p = *reta.pontoAtingido(*i);
+            bP = *vetorDistancia(this->base, p);        //(P - B)
+            meuTeste = bP * this->normal;
+            if(0 <= meuTeste and meuTeste <= this->altura) {
+                pontosAtingidos.push_back(p);
+            }
+        }
+        return pontosAtingidos;
+        
+        //Realizando o teste de validade dos pontos.
+
+
+
+    }
+
 };
 
 class Cone {

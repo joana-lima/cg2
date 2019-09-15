@@ -88,33 +88,52 @@ int main() {
     for(i=intersecao.begin(); i!=intersecao.end(); i++) {
         i->print();
     }
+
+    cout << "---------Teste da interseçao do cilindro------" << endl;
+
+    //Criando o cilindro
+    Ponto *base = new Ponto(2,0,0);
+    Vetor *normal = new Vetor(0,1,0);
     
-    // cout << "---------Teste de Objeto-------------------" << endl;
-    // Objeto *obj1 = new Objeto();
-    // Ponto *v1 = new Ponto(0, 0, 0);
-    // Ponto *v2 = new Ponto(1, 0, 0);
-    // Ponto *v3 = new Ponto(0, 1, 0);
-    // Ponto *v4 = new Ponto(0, 0, 1);
+    //Reta que colidirá com o cilindro
+    Ponto *pontoInicio = new Ponto(-4,1,0);
+    Vetor *direcaoReta = new Vetor(1,0,0);
+    Reta *reta2 = new Reta(*pontoInicio,*direcaoReta);
+    Cilindro *cilindro1 = new Cilindro(*base, *normal, 2, 4);
+    
 
-    // obj1->adicionarVertice(*v1);
-    // obj1->adicionarVertice(*v2);
-    // obj1->adicionarVertice(*v3);
-    // obj1->adicionarVertice(*v4);
+    list<Ponto> cilindroIntersecao = cilindro1->intRay(*reta2);
+    list<Ponto>::iterator k;
+    for(k=cilindroIntersecao.begin(); k!=cilindroIntersecao.end(); k++) {
+        k->print();
+    }
 
-    // list<Ponto> vertices = obj1->getVertices();
-    // for (int i = 0; i < vertices.size(); i++)
-    // {  
-    //     cout << "Vertices: " << &(vertices.begin())+i*sizeof(Ponto) << endl;
-    // }
+    cout << "---------Teste de Objeto-------------------" << endl;
+    Objeto *obj1 = new Objeto();
+    Ponto *v1 = new Ponto(0, 0, 0);
+    Ponto *v2 = new Ponto(1, 0, 0);
+    Ponto *v3 = new Ponto(0, 1, 0);
+    Ponto *v4 = new Ponto(0, 0, 1);
 
-    // obj1->adicionarAresta(*v1, *v2);
-    // obj1->adicionarAresta(*v1, *v3);
-    // obj1->adicionarAresta(*v1, *v4);
-    // obj1->adicionarAresta(*v2, *v3);
-    // obj1->adicionarAresta(*v3, *v4);
-    // obj1->adicionarAresta(*v4, *v2);
+    obj1->adicionarVertice(*v1);
+    obj1->adicionarVertice(*v2);
+    obj1->adicionarVertice(*v3);
+    obj1->adicionarVertice(*v4);
 
-    // list<list<Ponto>> arestas = obj1->getArestas();
-    // cout << "Arestas: " << endl; //TODO
+    list<Ponto> vertices = obj1->getVertices();
+    for (int i = 0; i < vertices.size(); i++)
+    {  
+        cout << "Vertices: " << &(vertices.begin())+i*sizeof(Ponto) << endl;
+    }
+
+    obj1->adicionarAresta(*v1, *v2);
+    obj1->adicionarAresta(*v1, *v3);
+    obj1->adicionarAresta(*v1, *v4);
+    obj1->adicionarAresta(*v2, *v3);
+    obj1->adicionarAresta(*v3, *v4);
+    obj1->adicionarAresta(*v4, *v2);
+
+    list<list<Ponto>> arestas = obj1->getArestas();
+    cout << "Arestas: " << endl; //TODO
 
 }
