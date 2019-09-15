@@ -27,6 +27,10 @@ class Ponto {
             this->id++;
         }
 
+        int getID() {
+            return this->id;
+        }
+
         double getX() {
             return this->x;
         }
@@ -60,7 +64,7 @@ class Ponto {
         }
 
         void print() {
-            cout << "Ponto X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n" << endl;
+            cout << "Ponto X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << endl;
         }
 };
 
@@ -166,12 +170,12 @@ list<double> equacaoSegundoGrau(double a, double b, double c) {
         return escalares;
     else {
         x1 = -b + sqrt(delta)/2*a;
-        escalares.push_front(x1);
+        escalares.push_back(x1);
         if(delta == 0)
             return escalares;
         else {
             x2 = -b - sqrt(delta)/2*a;
-            escalares.push_front(x2);
+            escalares.push_back(x2);
             return escalares;
         }
     }
@@ -179,56 +183,97 @@ list<double> equacaoSegundoGrau(double a, double b, double c) {
 
 class Objeto {
     protected:
-        int id = 0;
-        list<Ponto> vertices;
-        list<list<Ponto>> arestas;
-        list<list<Ponto>> faces;
-        bool visibilidade;
+    int id = 0;
+    list<Ponto> vertices;
+    list<list<Ponto>> arestas;
+    list<list<Ponto>> faces;
+    bool visibilidade;
 
     public:
-        Objeto() {
-            this->vertices = {};
-            this->arestas = {{}};
-            this->faces = {{}};
-            this->visibilidade = true;
-            this->id++;
-        }
+    Objeto() {
+        this->vertices = {};
+        this->arestas = {{}};
+        this->faces = {{}};
+        this->visibilidade = true;
+        this->id++;
+    }
 
-        void print(){
-            cout << "Objeto - ID: " << this->id <<endl;
-        }
+    void print(){
+        cout << "Objeto - ID: " << this->id <<endl;
+        cout << "Visibilidade: " << this->visibilidade <<endl;
 
-        bool getVisibilidade(){
-            return this->visibilidade;
+        cout << "Vertices: " << endl;
+        for (list<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
+            i->print();
         }
+        cout << endl;
+
+        cout << "Arestas: " << endl << "[\n";
+        for (list<list<Ponto>>::iterator i = arestas.begin(); i != arestas.end(); ++i){
+
+            cout << "[";
+
+            list<Ponto>& ponteiroParaPonto = *i;
+
+            for(list<Ponto>::iterator j = ponteiroParaPonto.begin(); j != ponteiroParaPonto.end(); j++){
+                cout << " ";
+                j->print();
+                cout << " ";
+            }
+
+            cout << "]\n";
+        }
+        cout << "]" << endl;
+
+        cout << "\nfaces: " << endl << "[\n";
+        for (list<list<Ponto>>::iterator i = faces.begin(); i != faces.end(); ++i){
+
+            cout << "[";
+
+            list<Ponto>& ponteiroParaPonto = *i;
+
+            for(list<Ponto>::iterator j = ponteiroParaPonto.begin(); j != ponteiroParaPonto.end(); j++){
+                cout << " ";
+                j->print();
+            }
+
+            cout << "]\n";
+        }
+        cout << "]" << endl;
         
-        void setVisibilidade(bool visibilidade){
-            this->visibilidade = visibilidade;
-        }
+    }
 
-        void adicionarVertice(Ponto vertice){
-            this->vertices.push_front(vertice);
-        }
+    bool getVisibilidade(){
+        return this->visibilidade;
+    }
+    
+    void setVisibilidade(bool visibilidade){
+        this->visibilidade = visibilidade;
+    }
 
-        void adicionarAresta(Ponto vertice1, Ponto vertice2){
-            this->arestas.push_front({vertice1, vertice2});
-        }
+    void adicionarVertice(Ponto vertice){
+        this->vertices.push_back(vertice);
+    }
 
-        void adicionarFace(Ponto vertice1, Ponto vertice2, Ponto vertice3){
-            this->faces.push_front({vertice1, vertice2, vertice3});
-        }
+    void adicionarAresta(Ponto vertice1, Ponto vertice2){
+        this->arestas.push_back({vertice1, vertice2});
+    }
 
-        list<Ponto> getVertices(){
-            return this->vertices;
-        }
+    void adicionarFace(Ponto vertice1, Ponto vertice2, Ponto vertice3){
+        this->faces.push_back({vertice1, vertice2, vertice3});
+    }
 
-        list<list<Ponto>> getArestas(){
-            return this->arestas;
-        }
+    list<Ponto> getVertices(){
+        return this->vertices;
+    }
 
-        list<list<Ponto>> getFaces(){
-            return this->faces;
-        }
+    list<list<Ponto>> getArestas(){
+        return this->arestas;
+    }
+
+    list<list<Ponto>> getFaces(){
+        return this->faces;
+    }
 
 };
 
@@ -289,7 +334,7 @@ class Plano {
         else                    return false;   
     }
 
-    list<Ponto> intRay(Reta reta) {
+    list<Ponto> intRaio(Reta reta) {
         list<Ponto> pontos;
         double temp = this->normal * (*reta.getVetor());
         if(temp == 0) {
@@ -299,14 +344,45 @@ class Plano {
             Vetor *vetor = vetorDistancia(*reta.getPonto(),this->ponto);
             double numerador = *vetor * this->normal;
             double tInt = numerador/temp;
-            pontos.push_front(*reta.pontoAtingido(tInt));
+            pontos.push_back(*reta.pontoAtingido(tInt));
             return pontos;
         }
     }
 };
 
-class Triangle : Objeto {
-    private:
+class Triangulo : Objeto {
+    public:
+    Triangulo() : Objeto() {}
+    
+    Triangulo(Ponto ponto1, Ponto ponto2, Ponto ponto3) {
+        this->adicionarVertice(ponto1);
+        this->adicionarVertice(ponto2);
+        this->adicionarVertice(ponto3);
+
+        this->adicionarAresta(ponto1, ponto2);
+        this->adicionarAresta(ponto2, ponto3);
+        this->adicionarAresta(ponto3, ponto1);
+
+        this->adicionarFace(ponto1, ponto2, ponto3);
+    }
+
+    // list<Ponto> intRaio(Reta raio) {
+    //     list<Ponto>::iterator vertices = this->vertices.begin();
+    //     copy(this->vertices.begin(), this->vertices.end(), vertices);
+
+    //     Vetor *p1p2 = vetorDistancia(vertices[1], vertices[0]);
+    //     Vetor *p1p3 = vetorDistancia(vertices[2], vertices[0]);
+    //     Vetor *p2p3 = vetorDistancia(vertices[2], vertices[1]);
+    //     Vetor *p3p1 = vetorDistancia(vertices[0], vertices[2]);
+    //     Vetor *n = p1p2->produtoVetorial(*p1p3)->normalizar();
+
+    //     Plano *planoTriangulo = new Plano(*vertices[0], *n);
+    //     list<Ponto> pontoInt = planoTriangulo->intRaio(raio);
+
+    //     if(pontoInt.size() == 0){   return pontoInt;}
+
+        
+    // }
 
 };
 
@@ -341,7 +417,7 @@ class Cilindro {
         return this->altura;
     }
 
-    list<Ponto> intRay(Reta reta) {
+    list<Ponto> intRaio(Reta reta) {
         list<Ponto> pontosAtingidos;
 
         //Vetor v
@@ -358,7 +434,7 @@ class Cilindro {
         //Cálculo dos coeficientes da equação do segundo grau.
         double a = w * w;
         double b = v * w;
-        double c = v * v - this->raio * this-> raio;
+        double c = v * v - this->raio * this->raio;
 
         list<double> escalares = equacaoSegundoGrau(a,2*b,c);
 
@@ -394,7 +470,6 @@ class Cone {
     Vetor normal;
     double raio;
     double altura;
-
 
     public:
     Cone(Ponto base, Vetor normal, double raio, double altura) {

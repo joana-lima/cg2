@@ -83,7 +83,7 @@ int main() {
 
     Vetor *meuvetor = new Vetor(0,0,-1);
     Reta *minhareta = new Reta(*ponto1,*meuvetor);
-    list<Ponto> intersecao = meuplano->intRay(*minhareta);
+    list<Ponto> intersecao = meuplano->intRaio(*minhareta);
     list<Ponto>::iterator i;
     for(i=intersecao.begin(); i!=intersecao.end(); i++) {
         i->print();
@@ -102,29 +102,25 @@ int main() {
     Cilindro *cilindro1 = new Cilindro(*base, *normal, 2, 4);
     
 
-    list<Ponto> cilindroIntersecao = cilindro1->intRay(*reta2);
+    list<Ponto> cilindroIntersecao = cilindro1->intRaio(*reta2);
     list<Ponto>::iterator k;
     for(k=cilindroIntersecao.begin(); k!=cilindroIntersecao.end(); k++) {
         k->print();
     }
 
-    cout << "---------Teste de Objeto-------------------" << endl;
+ cout << "---------Teste de Objeto-------------------" << endl;
     Objeto *obj1 = new Objeto();
     Ponto *v1 = new Ponto(0, 0, 0);
     Ponto *v2 = new Ponto(1, 0, 0);
     Ponto *v3 = new Ponto(0, 1, 0);
     Ponto *v4 = new Ponto(0, 0, 1);
 
+    obj1->setVisibilidade(false);
+
     obj1->adicionarVertice(*v1);
     obj1->adicionarVertice(*v2);
     obj1->adicionarVertice(*v3);
     obj1->adicionarVertice(*v4);
-
-    list<Ponto> vertices = obj1->getVertices();
-    for (int i = 0; i < vertices.size(); i++)
-    {  
-        cout << "Vertices: " << &(vertices.begin())+i*sizeof(Ponto) << endl;
-    }
 
     obj1->adicionarAresta(*v1, *v2);
     obj1->adicionarAresta(*v1, *v3);
@@ -133,7 +129,14 @@ int main() {
     obj1->adicionarAresta(*v3, *v4);
     obj1->adicionarAresta(*v4, *v2);
 
-    list<list<Ponto>> arestas = obj1->getArestas();
-    cout << "Arestas: " << endl; //TODO
+    obj1->adicionarFace(*v1, *v3, *v2);
+    obj1->adicionarFace(*v1, *v3, *v4);
+    obj1->adicionarFace(*v1, *v4, *v2);
+    obj1->adicionarFace(*v2, *v3, *v4);
 
+    obj1->print();
+
+    // cout << "---------Teste de Triangulo-------------------" << endl; //TODO
+    // Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
+    // list<Ponto> vertices = triangulo->getVertices();
 }
