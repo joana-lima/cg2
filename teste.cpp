@@ -83,7 +83,7 @@ int main() {
 
     Vetor *meuvetor = new Vetor(0,0,-1);
     Reta *minhareta = new Reta(*ponto1,*meuvetor);
-    list<Ponto> intersecao = meuplano->intRay(*minhareta);
+    list<Ponto> intersecao = meuplano->intRaio(*minhareta);
     list<Ponto>::iterator i;
     for(i=intersecao.begin(); i!=intersecao.end(); i++) {
         i->print();
@@ -116,4 +116,9 @@ int main() {
     obj1->adicionarFace(*v2, *v3, *v4);
 
     obj1->print();
+
+    // cout << "---------Teste de Triangulo-------------------" << endl; //TODO
+    // Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
+    // list<Ponto> vertices = triangulo->getVertices();
+
 }
