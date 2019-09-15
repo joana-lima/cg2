@@ -96,6 +96,8 @@ int main() {
     Ponto *v3 = new Ponto(0, 1, 0);
     Ponto *v4 = new Ponto(0, 0, 1);
 
+    obj1->setVisibilidade(false);
+
     obj1->adicionarVertice(*v1);
     obj1->adicionarVertice(*v2);
     obj1->adicionarVertice(*v3);

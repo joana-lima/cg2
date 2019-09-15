@@ -200,6 +200,7 @@ class Objeto {
 
         void print(){
             cout << "Objeto - ID: " << this->id <<endl;
+            cout << "Visibilidade: " << this->visibilidade <<endl;
 
             cout << "Vertices: " << endl;
             for (list<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
