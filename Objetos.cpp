@@ -169,12 +169,12 @@ list<double> equacaoSegundoGrau(double a, double b, double c) {
     if(delta < 0)
         return escalares;
     else {
-        x1 = -b + sqrt(delta)/2*a;
+        x1 = (-b + sqrt(delta))/2*a;
         escalares.push_back(x1);
         if(delta == 0)
             return escalares;
         else {
-            x2 = -b - sqrt(delta)/2*a;
+            x2 = (-b - sqrt(delta))/2*a;
             escalares.push_back(x2);
             return escalares;
         }
@@ -500,7 +500,8 @@ class Cone {
         return this->vertice;
     }
 
-    /*Implementar
-    double getCossenoGeratriz()*/
+    double getCossenoGeratriz() {
+        return this->altura / sqrt(pow(this->altura,2) + pow(this->raio,2));
+    }
 
 };
