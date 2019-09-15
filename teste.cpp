@@ -82,6 +82,14 @@ int main() {
     cout << teste << endl;
 
     cout << "---------Teste da interseção raio-plano----" << endl; //Por fazer.
+
+    Vetor *meuvetor = new Vetor(0,0,-1);
+    Reta *minhareta = new Reta(*ponto1,*meuvetor);
+    list<Ponto> intersecao = meuplano->intRay(*minhareta);
+    list<Ponto>::iterator i;
+    for(i=intersecao.begin(); i!=intersecao.end(); i++) {
+        i->print();
+    }
     
     cout << "---------Teste de Objeto-------------------" << endl;
     Objeto *obj1 = new Objeto();
@@ -110,6 +118,5 @@ int main() {
 
     list<list<Ponto>> arestas = obj1->getArestas();
     cout << "Arestas: " << endl; //TODO
-    
-    
+
 }
