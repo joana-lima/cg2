@@ -525,7 +525,7 @@ class Cone {
             //Testando validade dos pontos.
             p = *reta.pontoAtingido(*i);
             teste = *vetorDistancia(p, this->vertice) * this->normal;
-            if(0<=teste and teste<=this->altura) {
+            if(0<=teste && teste<=this->altura) {
                 pontosAtingidos.push_back(p);
             }
         }
