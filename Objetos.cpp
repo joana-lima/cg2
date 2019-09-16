@@ -285,7 +285,7 @@ class Reta {
     public:
     Reta(Ponto ponto, Vetor vetor) {
         this->ponto = ponto;
-        this->vetor = vetor;
+        this->vetor = *vetor.normalizar();
     }
 
     Ponto *getPonto() {
@@ -396,7 +396,7 @@ class Cilindro {
     public:
     Cilindro(Ponto base, Vetor normal, double raio, double altura) {
         this->base = base;
-        this->normal = normal;
+        this->normal = *normal.normalizar();
         this->raio = raio;
         this->altura = altura;
     }
@@ -474,7 +474,7 @@ class Cone {
     public:
     Cone(Ponto base, Vetor normal, double raio, double altura) {
         this->base = base;
-        this->normal = normal;
+        this->normal = *normal.normalizar();
         this->raio = raio;
         this->altura = altura;
         this->vertice = *somaPontoVetor(this->base, *(this->normal.multEscalar(this->altura)));
@@ -504,4 +504,31 @@ class Cone {
         return this->altura / sqrt(pow(this->altura,2) + pow(this->raio,2));
     }
 
+    list<Ponto> intRaio(Reta reta) {
+        list<Ponto> pontosAtingidos;
+        //vetor v
+        Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
+    
+        //Cálculo dos coeficientes da equaçao do segundo grau
+        double a = (*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal);
+        double b = (v * *reta.getVetor()) * pow(this->getCossenoGeratriz(),2) - 
+                   (v * this->normal) * (*reta.getVetor() * this->normal);
+        double c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
+
+        //Achando os escalates da intersecao.
+        list<double> escalares = equacaoSegundoGrau(a,2*b,c);
+
+        list<double>::iterator i;
+        Ponto p;
+        double teste;
+        for(i=escalares.begin(); i != escalares.end(); i++) {
+            //Testando validade dos pontos.
+            p = *reta.pontoAtingido(*i);
+            teste = *vetorDistancia(p, this->vertice) * this->normal;
+            if(0<=teste and teste<=this->altura) {
+                pontosAtingidos.push_back(p);
+            }
+        }
+        return pontosAtingidos;
+    }
 };
