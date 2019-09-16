@@ -449,7 +449,7 @@ class Cilindro {
             p = *reta.pontoAtingido(*i);
             bP = *vetorDistancia(this->base, p);        //(P - B)
             meuTeste = bP * this->normal;
-            if(0 <= meuTeste and meuTeste <= this->altura) {
+            if(0 <= meuTeste && meuTeste <= this->altura) {
                 pontosAtingidos.push_back(p);
             }
         }
