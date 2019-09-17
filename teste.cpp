@@ -18,44 +18,44 @@ int main() {
 
     // **********INICIO TESTE DA CLASSE VETOR***************
 
-    cout << "-----------Teste print------------" << endl;
+    cout << "\n-----------Teste print------------" << endl;
     vetor1->print();
     vetor2->print();
 
-    cout << "------------Teste Produto Escalar------------" << endl;
+    cout << "\n------------Teste Produto Escalar------------" << endl;
     resultado = vetor1->produtoEscalar(*vetor2);
     cout << resultado << endl;
 
-    cout << "------------Teste Multiplicação por Escalar-----------" << endl;
+    cout << "\n------------Teste Multiplicação por Escalar-----------" << endl;
     vetor3 = vetor2->multEscalar(4);
     vetor3->print();
     vetor3 = vetor2->multEscalar(0);
     vetor3->print();
     
-    cout << "--------------Teste Cálculo da Norma------------" << endl;
+    cout << "\n--------------Teste Cálculo da Norma------------" << endl;
     resultado = vetor1->calcularNorma();
     cout << "vetor1 - Norma: " << resultado << endl;
     cout << "vetor2 - Norma: " << resultado << endl;
 
 
-    cout << "--------------Teste Normalizar----------" << endl;
+    cout << "\n--------------Teste Normalizar----------" << endl;
     vetor4 = new Vetor(4,2,8);
     vetor4 = vetor4->normalizar();
     vetor4->print();
 
-    cout << "---------------Teste do operador + --------------- " << endl;
+    cout << "\n---------------Teste do operador + --------------- " << endl;
     *vetor3 = *vetor1 + *vetor2;
     vetor3->print();
 
-    cout << "---------------Teste do operador - ----------------" << endl;
+    cout << "\n---------------Teste do operador - ----------------" << endl;
     *vetor3 = *vetor1 - *vetor2;
     vetor3->print();
 
-    cout << "---------------Teste do operador * (produto escalar)---------" << endl;
+    cout << "\n---------------Teste do operador * (produto escalar)---------" << endl;
     resultado = *vetor1 * *vetor2;
     cout << "produto escalar: " << resultado << endl;
 
-    cout << "-----------Teste Produto Vetorial------------------" << endl;
+    cout << "\n-----------Teste Produto Vetorial------------------" << endl;
     vetor3 = vetor5->produtoVetorial(*vetor6);
     vetor3->print();
 
@@ -138,12 +138,43 @@ int main() {
 
     cout << "---------Teste de Triangulo-------------------" << endl;
     Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
-    Reta *retaTriangulo = new Reta(Ponto(0.0, 0.2, -1.0), Vetor(0.0, 0.0, -1.0));
-    vector<Ponto> intTriangulo = triangulo->intRaio(*retaTriangulo);
+    Reta *retaTrianguloMiss = new Reta(Ponto(0.0, -0.2, -1.0), Vetor(0.0, 0.0, -1.0));
+    vector<Ponto> intTrianguloMiss = triangulo->intRaio(*retaTrianguloMiss);
     // triangulo->print();
 
-    for(int i = 0; i < intTriangulo.size(); i++){
-        intTriangulo[i].print();
+    for(int i = 0; i < intTrianguloMiss.size(); i++){
+        intTrianguloMiss[i].print();
+    }
+
+    Reta *retaTrianguloHit = new Reta(Ponto(0.1, 0.2, -1.0), Vetor(0.0, 0.0, -1.0));
+    vector<Ponto> intTrianguloHit = triangulo->intRaio(*retaTrianguloHit);
+    // triangulo->print();
+
+    for(int i = 0; i < intTrianguloHit.size(); i++){
+        intTrianguloHit[i].print();
+    }
+
+    cout << "\n---------Teste de Cubo-------------------" << endl;
+    Cubo *cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0, Vetor(0.0, 1.0, 0.0));
+    Reta *retaCuboMiss = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
+    Reta *retaCuboHit = new Reta(Ponto(0.0, 0.0, -1.0), Vetor(0.0, 0.0, -1.0));
+
+    
+    cout << "CUBO" << endl;
+    cubo->print();
+    cout << endl;
+
+    vector<Ponto> intCuboHit = cubo->intRaio(*retaCuboHit);
+    vector<Ponto> intCuboMiss = cubo->intRaio(*retaCuboMiss);
+
+    cout << "\ninicio de teste que deve errar: ";
+    for(int i = 0; i < intCuboMiss.size(); i++){
+        intCuboMiss[i].print();
+    }
+
+    cout << "\ninicio de teste que deve acertar:\n";
+    for(int i = 0; i < intCuboHit.size(); i++){
+        intCuboHit[i].print();
     }
 
 }

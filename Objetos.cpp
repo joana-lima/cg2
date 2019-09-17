@@ -192,8 +192,8 @@ class Objeto {
     public:
     Objeto() {
         this->vertices = {};
-        this->arestas = {{}};
-        this->faces = {{}};
+        this->arestas = {};
+        this->faces = {};
         this->visibilidade = true;
         this->id++;
     }
@@ -368,7 +368,9 @@ class Triangulo : public Objeto {
         Plano *planoTriangulo = new Plano(vertices[0], *n);
         vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
 
-        if(pontoInt.size() == 0){   return pontoInt;};
+        if(pontoInt.size() == 0){
+            return pontoInt;
+        };
 
         Vetor *p1p = vetorDistancia(pontoInt[0], vertices[0]);
         Vetor *p2p = vetorDistancia(pontoInt[0], vertices[1]);
@@ -388,6 +390,131 @@ class Triangulo : public Objeto {
     }
 
     
+};
+
+class Cubo : public Objeto {
+    protected:
+    Ponto centro;
+    Vetor direcao;
+    double largura;
+
+    Triangulo *triangulo1;
+    Triangulo *triangulo2;
+    Triangulo *triangulo3;
+    Triangulo *triangulo4;
+    Triangulo *triangulo5;
+    Triangulo *triangulo6;
+    Triangulo *triangulo7;
+    Triangulo *triangulo8;
+    Triangulo *triangulo9;
+    Triangulo *triangulo10;
+    Triangulo *triangulo11;
+    Triangulo *triangulo12;
+
+    public:
+    Cubo() : Objeto() {}
+
+    Cubo(Ponto centro, float largura, Vetor direcao){
+        this->centro = centro;
+        this->largura = largura;
+        this->direcao = direcao;
+        
+        double ml = largura/2;  //Meia Largura: ml
+        Ponto *p1 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() - ml);
+        Ponto *p2 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() + ml);
+        Ponto *p3 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() + ml);
+        Ponto *p4 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() - ml);
+        Ponto *p5 = new Ponto(this->centro.getX() - ml, this->centro.getY() - ml, this->centro.getZ() - ml);
+        Ponto *p6 = new Ponto(this->centro.getX() - ml, this->centro.getY() - ml, this->centro.getZ() + ml);
+        Ponto *p7 = new Ponto(this->centro.getX() + ml, this->centro.getY() - ml, this->centro.getZ() + ml);
+        Ponto *p8 = new Ponto(this->centro.getX() + ml, this->centro.getY() - ml, this->centro.getZ() - ml);
+
+        this->adicionarVertice(*p1);
+        this->adicionarVertice(*p2);
+        this->adicionarVertice(*p3);
+        this->adicionarVertice(*p4);
+        this->adicionarVertice(*p5);
+        this->adicionarVertice(*p6);
+        this->adicionarVertice(*p7);
+        this->adicionarVertice(*p8);
+        
+        this->adicionarAresta(*p1, *p2);
+        this->adicionarAresta(*p2, *p3);
+        this->adicionarAresta(*p3, *p4);
+        this->adicionarAresta(*p4, *p1);
+        this->adicionarAresta(*p5, *p6);
+        this->adicionarAresta(*p6, *p7);
+        this->adicionarAresta(*p7, *p8);
+        this->adicionarAresta(*p8, *p5);
+        this->adicionarAresta(*p1, *p5);
+        this->adicionarAresta(*p2, *p6);
+        this->adicionarAresta(*p3, *p7);
+        this->adicionarAresta(*p4, *p8);
+
+        this->adicionarFace(*p1, *p2, *p3);
+        this->adicionarFace(*p1, *p3, *p4);
+        this->adicionarFace(*p5, *p7, *p6);
+        this->adicionarFace(*p5, *p8, *p7);
+        this->adicionarFace(*p1, *p5, *p6);
+        this->adicionarFace(*p1, *p6, *p2);
+        this->adicionarFace(*p2, *p6, *p7);
+        this->adicionarFace(*p2, *p7, *p3);
+        this->adicionarFace(*p3, *p7, *p8);
+        this->adicionarFace(*p3, *p8, *p4);
+        this->adicionarFace(*p4, *p8, *p5);
+        this->adicionarFace(*p4, *p5, *p1);
+
+        this->triangulo1 = new Triangulo(*p1, *p2, *p3);
+        this->triangulo2 = new Triangulo(*p1, *p3, *p4);
+        this->triangulo3 = new Triangulo(*p5, *p7, *p6);
+        this->triangulo4 = new Triangulo(*p5, *p8, *p7);
+        this->triangulo5 = new Triangulo(*p1, *p5, *p6);
+        this->triangulo6 = new Triangulo(*p1, *p6, *p2);
+        this->triangulo7 = new Triangulo(*p2, *p6, *p7);
+        this->triangulo8 = new Triangulo(*p2, *p7, *p3);
+        this->triangulo9 = new Triangulo(*p3, *p7, *p8);
+        this->triangulo10 = new Triangulo(*p3, *p8, *p4);
+        this->triangulo11 = new Triangulo(*p4, *p8, *p5);
+        this->triangulo12 = new Triangulo(*p4, *p5, *p1);
+    }
+
+    Ponto getCentro(){
+        return this->centro;
+    }
+
+    Vetor getDirecao(){
+        return this->direcao;
+    }
+
+    double getLargura(){
+        return this->largura;
+    }
+
+    vector<Ponto> intRaio(Reta raio){
+        vector<vector<Ponto>> pontosIntRaio = {{}};
+
+        pontosIntRaio.push_back(this->triangulo1->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo2->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo3->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo4->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo5->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo6->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo7->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo8->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo9->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo10->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo11->intRaio(raio));
+        pontosIntRaio.push_back(this->triangulo12->intRaio(raio));
+
+        vector<Ponto> pontosIntRaioOutput;
+        for(int i = 0; i < pontosIntRaio.size(); i++){
+            if(pontosIntRaio[i].size() > 0){
+                pontosIntRaioOutput.push_back(pontosIntRaio[i][0]);
+            }
+        }
+
+        return pontosIntRaioOutput;
+    }
 };
 
 class Cilindro {
