@@ -74,15 +74,15 @@ int main() {
 
     //***************INICIO TESTES CLASSE PLANO**********************
     cout << "----------Teste do pertencePlano----------------" << endl;
-    Plano *meuplano = new Plano(*ponto3, *vetor7);
-    Ponto *ponto4 = new Ponto(1,4,0);
+    Plano *meuplano = new Plano(Ponto(0, 0, 0), Vetor(0, 0, 1));
+    Ponto *ponto4 = new Ponto(1, 1, 0);
     bool teste = meuplano->pertencePlano(*ponto4);
     cout << teste << endl;
 
     cout << "---------Teste da interseção raio-plano----" << endl; //Por fazer.
 
     Vetor *meuvetor = new Vetor(0,0,-1);
-    Reta *minhareta = new Reta(*ponto1,*meuvetor);
+    Reta *minhareta = new Reta(Ponto(0, 0, 1),*meuvetor);
     vector<Ponto> intersecao = meuplano->intRaio(*minhareta);
     vector<Ponto>::iterator i;
     for(i=intersecao.begin(); i!=intersecao.end(); i++) {
@@ -136,7 +136,14 @@ int main() {
 
     obj1->print();
 
-    // cout << "---------Teste de Triangulo-------------------" << endl; //TODO
-    // Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
-    // vector<Ponto> vertices = triangulo->getVertices();
+    cout << "---------Teste de Triangulo-------------------" << endl;
+    Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
+    Reta *retaTriangulo = new Reta(Ponto(0.0, 0.2, -1.0), Vetor(0.0, 0.0, -1.0));
+    vector<Ponto> intTriangulo = triangulo->intRaio(*retaTriangulo);
+    // triangulo->print();
+
+    for(int i = 0; i < intTriangulo.size(); i++){
+        intTriangulo[i].print();
+    }
+
 }
