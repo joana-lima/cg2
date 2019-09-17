@@ -200,7 +200,8 @@ class Objeto {
 
     void print(){
         cout << "Objeto - ID: " << id <<endl;
-        cout << "Visibilidade: " << visibilidade ? "true" : "false" << endl;
+        cout << "Visibilidade: ";
+        visibilidade ? cout << "true\n" : cout<<"false\n";
 
         cout << vertices.size() << " Vertices: " << endl;
         for (int i = 0; i < vertices.size(); i++){
