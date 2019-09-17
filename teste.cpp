@@ -83,8 +83,8 @@ int main() {
 
     Vetor *meuvetor = new Vetor(0,0,-1);
     Reta *minhareta = new Reta(*ponto1,*meuvetor);
-    list<Ponto> intersecao = meuplano->intRaio(*minhareta);
-    list<Ponto>::iterator i;
+    vector<Ponto> intersecao = meuplano->intRaio(*minhareta);
+    vector<Ponto>::iterator i;
     for(i=intersecao.begin(); i!=intersecao.end(); i++) {
         i->print();
     }
@@ -102,8 +102,8 @@ int main() {
     Cilindro *cilindro1 = new Cilindro(*base, *normal, 2, 4);
     
 
-    list<Ponto> cilindroIntersecao = cilindro1->intRaio(*reta2);
-    list<Ponto>::iterator k;
+    vector<Ponto> cilindroIntersecao = cilindro1->intRaio(*reta2);
+    vector<Ponto>::iterator k;
     for(k=cilindroIntersecao.begin(); k!=cilindroIntersecao.end(); k++) {
         k->print();
     }
@@ -138,5 +138,5 @@ int main() {
 
     // cout << "---------Teste de Triangulo-------------------" << endl; //TODO
     // Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
-    // list<Ponto> vertices = triangulo->getVertices();
+    // vector<Ponto> vertices = triangulo->getVertices();
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -10,7 +10,7 @@ class Ponto {
         double x;
         double y;
         double z;
-        list<float> cor;
+        vector<float> cor;
 
     public:
         Ponto() {
@@ -55,7 +55,7 @@ class Ponto {
             this->z = z;
         }
 
-        list<float> getCor() {
+        vector<float> getCor() {
             return this->cor;
         }
         
@@ -162,10 +162,10 @@ Vetor *vetorDistancia(Ponto p1, Ponto p2) {     //(p2 - p1) Vetor que vai de p1 
     return distancia;
 }
 
-list<double> equacaoSegundoGrau(double a, double b, double c) {
+vector<double> equacaoSegundoGrau(double a, double b, double c) {
     double delta = b*b - 4*a*c;
     double x1, x2;
-    list<double> escalares;
+    vector<double> escalares;
     if(delta < 0)
         return escalares;
     else {
@@ -184,9 +184,9 @@ list<double> equacaoSegundoGrau(double a, double b, double c) {
 class Objeto {
     protected:
     int id = 0;
-    list<Ponto> vertices;
-    list<list<Ponto>> arestas;
-    list<list<Ponto>> faces;
+    vector<Ponto> vertices;
+    vector<vector<Ponto>> arestas;
+    vector<vector<Ponto>> faces;
     bool visibilidade;
 
     public:
@@ -199,44 +199,34 @@ class Objeto {
     }
 
     void print(){
-        cout << "Objeto - ID: " << this->id <<endl;
-        cout << "Visibilidade: " << this->visibilidade <<endl;
+        cout << "Objeto - ID: " << id <<endl;
+        cout << "Visibilidade: " << visibilidade ? "true" : "false" << endl;
 
-        cout << "Vertices: " << endl;
-        for (list<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
-            i->print();
+        cout << vertices.size() << " Vertices: " << endl;
+        for (int i = 0; i < vertices.size(); i++){
+            vertices[i].print();
         }
         cout << endl;
 
-        cout << "Arestas: " << endl << "[\n";
-        for (list<list<Ponto>>::iterator i = arestas.begin(); i != arestas.end(); ++i){
-
-            cout << "[";
-
-            list<Ponto>& ponteiroParaPonto = *i;
-
-            for(list<Ponto>::iterator j = ponteiroParaPonto.begin(); j != ponteiroParaPonto.end(); j++){
+        cout << arestas.size() << " Arestas: " << endl << "[\n";
+        for (int i = 0; i < arestas.size(); i++) {
+            cout << "[" ;
+            for(int j = 0; j < arestas[i].size(); j++){
                 cout << " ";
-                j->print();
+                arestas[i][j].print();
                 cout << " ";
             }
-
             cout << "]\n";
         }
         cout << "]" << endl;
 
-        cout << "\nfaces: " << endl << "[\n";
-        for (list<list<Ponto>>::iterator i = faces.begin(); i != faces.end(); ++i){
-
+        cout << faces.size() << " faces: " << endl << "[\n";
+        for (int i = 0; i < faces.size(); i++){
             cout << "[";
-
-            list<Ponto>& ponteiroParaPonto = *i;
-
-            for(list<Ponto>::iterator j = ponteiroParaPonto.begin(); j != ponteiroParaPonto.end(); j++){
+            for(int j = 0; j < faces[i].size(); j++){
                 cout << " ";
-                j->print();
+                faces[i][j].print();
             }
-
             cout << "]\n";
         }
         cout << "]" << endl;
@@ -263,15 +253,15 @@ class Objeto {
         this->faces.push_back({vertice1, vertice2, vertice3});
     }
 
-    list<Ponto> getVertices(){
+    vector<Ponto> getVertices(){
         return this->vertices;
     }
 
-    list<list<Ponto>> getArestas(){
+    vector<vector<Ponto>> getArestas(){
         return this->arestas;
     }
 
-    list<list<Ponto>> getFaces(){
+    vector<vector<Ponto>> getFaces(){
         return this->faces;
     }
 
@@ -334,8 +324,8 @@ class Plano {
         else                    return false;   
     }
 
-    list<Ponto> intRaio(Reta reta) {
-        list<Ponto> pontos;
+    vector<Ponto> intRaio(Reta reta) {
+        vector<Ponto> pontos;
         double temp = this->normal * (*reta.getVetor());
         if(temp == 0) {
             return pontos;
@@ -366,23 +356,21 @@ class Triangulo : Objeto {
         this->adicionarFace(ponto1, ponto2, ponto3);
     }
 
-    // list<Ponto> intRaio(Reta raio) {
-    //     list<Ponto>::iterator vertices = this->vertices.begin();
-    //     copy(this->vertices.begin(), this->vertices.end(), vertices);
+    vector<Ponto> intRaio(Reta raio) {
 
-    //     Vetor *p1p2 = vetorDistancia(vertices[1], vertices[0]);
-    //     Vetor *p1p3 = vetorDistancia(vertices[2], vertices[0]);
-    //     Vetor *p2p3 = vetorDistancia(vertices[2], vertices[1]);
-    //     Vetor *p3p1 = vetorDistancia(vertices[0], vertices[2]);
-    //     Vetor *n = p1p2->produtoVetorial(*p1p3)->normalizar();
+        Vetor *p1p2 = vetorDistancia(vertices[1], vertices[0]);
+        Vetor *p1p3 = vetorDistancia(vertices[2], vertices[0]);
+        Vetor *p2p3 = vetorDistancia(vertices[2], vertices[1]);
+        Vetor *p3p1 = vetorDistancia(vertices[0], vertices[2]);
+        Vetor *n = p1p2->produtoVetorial(*p1p3)->normalizar();
 
-    //     Plano *planoTriangulo = new Plano(*vertices[0], *n);
-    //     list<Ponto> pontoInt = planoTriangulo->intRaio(raio);
+        Plano *planoTriangulo = new Plano(vertices[0], *n);
+        vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
 
-    //     if(pontoInt.size() == 0){   return pontoInt;}
+        if(pontoInt.size() == 0){   return pontoInt;}
 
-        
-    // }
+
+    }
 
 };
 
@@ -417,8 +405,8 @@ class Cilindro {
         return this->altura;
     }
 
-    list<Ponto> intRaio(Reta reta) {
-        list<Ponto> pontosAtingidos;
+    vector<Ponto> intRaio(Reta reta) {
+        vector<Ponto> pontosAtingidos;
 
         //Vetor v
         Vetor *bPo = vetorDistancia(this->base,*reta.getPonto()); //(Po - B)
@@ -436,10 +424,10 @@ class Cilindro {
         double b = v * w;
         double c = v * v - this->raio * this->raio;
 
-        list<double> escalares = equacaoSegundoGrau(a,2*b,c);
+        vector<double> escalares = equacaoSegundoGrau(a,2*b,c);
 
-        //Obtendo lista de pontos Atingidos
-        list<double>::iterator i;
+        //Obtendo vectora de pontos Atingidos
+        vector<double>::iterator i;
         aux = 0;
         Ponto p;
         Vetor bP;
@@ -504,8 +492,8 @@ class Cone {
         return this->altura / sqrt(pow(this->altura,2) + pow(this->raio,2));
     }
 
-    list<Ponto> intRaio(Reta reta) {
-        list<Ponto> pontosAtingidos;
+    vector<Ponto> intRaio(Reta reta) {
+        vector<Ponto> pontosAtingidos;
         //vetor v
         Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
     
@@ -516,9 +504,9 @@ class Cone {
         double c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
 
         //Achando os escalates da intersecao.
-        list<double> escalares = equacaoSegundoGrau(a,2*b,c);
+        vector<double> escalares = equacaoSegundoGrau(a,2*b,c);
 
-        list<double>::iterator i;
+        vector<double>::iterator i;
         Ponto p;
         double teste;
         for(i=escalares.begin(); i != escalares.end(); i++) {
