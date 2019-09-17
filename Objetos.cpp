@@ -341,7 +341,7 @@ class Plano {
     }
 };
 
-class Triangulo : Objeto {
+class Triangulo : public Objeto {
     public:
     Triangulo() : Objeto() {}
     
@@ -368,11 +368,26 @@ class Triangulo : Objeto {
         Plano *planoTriangulo = new Plano(vertices[0], *n);
         vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
 
-        if(pontoInt.size() == 0){   return pontoInt;}
+        if(pontoInt.size() == 0){   return pontoInt;};
 
+        Vetor *p1p = vetorDistancia(pontoInt[0], vertices[0]);
+        Vetor *p2p = vetorDistancia(pontoInt[0], vertices[1]);
+        Vetor *p3p = vetorDistancia(pontoInt[0], vertices[2]);
 
+        Vetor *p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
+        double sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
+        double sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
+        double sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
+
+        if(sE >= 0 && sN >= 0 && sS >= 0){
+            return pontoInt;
+        } else {
+            pontoInt.clear();
+            return pontoInt;
+        }
     }
 
+    
 };
 
 class Cilindro {
