@@ -1,8 +1,14 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
+#include "RenderAPI.h"
 
 using namespace std;
+
+//pixel buffer
+RenderAPI::VertexBuffer vbo;
+
+const int width = 512, height = 512;
 
 class Ponto {
     protected:
@@ -79,12 +85,12 @@ class Vetor: public Ponto {
         return resultado;
     }
 
-    Vetor *multEscalar(double escalar) {  //Multiplicaçao de um vetor por um escalar
+    Vetor* multEscalar(double escalar) {  //Multiplicaçao de um vetor por um escalar
         double novoX, novoY, novoZ;
         novoX = this->x * escalar;
         novoY = this->y * escalar;
         novoZ = this->z * escalar;
-        Vetor *resultado = new Vetor(novoX, novoY, novoZ);
+        Vetor* resultado = new Vetor(novoX, novoY, novoZ);
         return resultado;
     }
 
@@ -93,9 +99,9 @@ class Vetor: public Ponto {
         return norma;
     }
 
-    Vetor *normalizar() {
+    Vetor* normalizar() {
         double norma = this->calcularNorma();
-        Vetor *novoVetor = this->multEscalar(1/norma);
+        Vetor* novoVetor = this->multEscalar(1/norma);
         return novoVetor;
     }
     
@@ -125,36 +131,36 @@ class Vetor: public Ponto {
         return resultado;
     }
 
-    Vetor *produtoVetorial(Vetor vetor){
-        Vetor *vetorUnitI = new Vetor(1.0, 0.0, 0.0);
-        Vetor *vetorUnitJ = new Vetor(0.0, 1.0, 0.0);
-        Vetor *vetorUnitK = new Vetor(0.0, 0.0, 1.0);
+    Vetor* produtoVetorial(Vetor vetor){
+        Vetor* vetorUnitI = new Vetor(1.0, 0.0, 0.0);
+        Vetor* vetorUnitJ = new Vetor(0.0, 1.0, 0.0);
+        Vetor* vetorUnitK = new Vetor(0.0, 0.0, 1.0);
 
         double xVetor = vetor.getX();
         double yVetor = vetor.getY();
         double zVetor = vetor.getZ();
 
-        Vetor *diagonalPrincipal = new Vetor;
+        Vetor* diagonalPrincipal = new Vetor;
         *diagonalPrincipal = *vetorUnitI->multEscalar(this->y * zVetor) + *vetorUnitJ->multEscalar(this->z * xVetor) + *vetorUnitK->multEscalar(this->x * yVetor);
-        Vetor *diagonalSecundaria = new Vetor;
+        Vetor* diagonalSecundaria = new Vetor;
         *diagonalSecundaria = *vetorUnitK->multEscalar(this->y * xVetor) + *vetorUnitI->multEscalar(this->z * yVetor) + *vetorUnitJ->multEscalar(this->x * zVetor);
-        Vetor *resultado = new Vetor(diagonalPrincipal->getX() - diagonalSecundaria->getX(), diagonalPrincipal->getY() - diagonalSecundaria->getY(), diagonalPrincipal->getZ() - diagonalSecundaria->getZ());
+        Vetor* resultado = new Vetor(diagonalPrincipal->getX() - diagonalSecundaria->getX(), diagonalPrincipal->getY() - diagonalSecundaria->getY(), diagonalPrincipal->getZ() - diagonalSecundaria->getZ());
         
         return resultado;
     }
 };
 
-Ponto *somaPontoVetor(Ponto ponto, Vetor vetor) {
+Ponto* somaPontoVetor(Ponto ponto, Vetor vetor) {
     double x, y, z;
     x = ponto.getX() + vetor.getX();
     y = ponto.getY() + vetor.getY();
     z = ponto.getZ() + vetor.getZ();
-    Ponto *atingido = new Ponto(x,y,z);
+    Ponto* atingido = new Ponto(x,y,z);
     return atingido;
 }
 
-Vetor *vetorDistancia(Ponto p1, Ponto p2) {     //(p2 - p1) Vetor que vai de p1 à p2
-    Vetor *distancia;
+Vetor* vetorDistancia(Ponto p1, Ponto p2) {     //(p2 - p1) Vetor que vai de p1 à p2
+    Vetor* distancia;
     double x = p2.getX() - p1.getX();
     double y = p2.getY() - p1.getY();
     double z = p2.getZ() - p1.getZ();
@@ -279,11 +285,11 @@ class Reta {
         this->vetor = *vetor.normalizar();
     }
 
-    Ponto *getPonto() {
+    Ponto* getPonto() {
         return &this->ponto;
     }
 
-    Vetor *getVetor() {
+    Vetor* getVetor() {
         return &this->vetor;
     }
 
@@ -293,8 +299,8 @@ class Reta {
         vetor.print();
     }
 
-    Ponto *pontoAtingido(double k) {
-        Ponto *atingido = somaPontoVetor(this->ponto, *(this->vetor.multEscalar(k)));
+    Ponto* pontoAtingido(double k) {
+        Ponto* atingido = somaPontoVetor(this->ponto, *(this->vetor.multEscalar(k)));
         return atingido;
     }
 };
@@ -310,16 +316,16 @@ class Plano {
         this->normal = normal;
     }
 
-    Ponto *getPonto() {
+    Ponto* getPonto() {
         return &this->ponto;
     }
 
-    Vetor *getNormal() {
+    Vetor* getNormal() {
         return &this->normal;
     }
 
     bool pertencePlano(Ponto ponto) {
-        Vetor *distancia = vetorDistancia(this->ponto, ponto);
+        Vetor* distancia = vetorDistancia(this->ponto, ponto);
         double resultado = *distancia * (this->normal);
         if(resultado == 0)      return true;
         else                    return false;   
@@ -332,7 +338,7 @@ class Plano {
             return pontos;
         }
         else {
-            Vetor *vetor = vetorDistancia(*reta.getPonto(),this->ponto);
+            Vetor* vetor = vetorDistancia(*reta.getPonto(),this->ponto);
             double numerador = *vetor * this->normal;
             double tInt = numerador/temp;
             pontos.push_back(*reta.pontoAtingido(tInt));
@@ -359,24 +365,24 @@ class Triangulo : public Objeto {
 
     vector<Ponto> intRaio(Reta raio) {
 
-        Vetor *p1p2 = vetorDistancia(vertices[1], vertices[0]);
-        Vetor *p1p3 = vetorDistancia(vertices[2], vertices[0]);
-        Vetor *p2p3 = vetorDistancia(vertices[2], vertices[1]);
-        Vetor *p3p1 = vetorDistancia(vertices[0], vertices[2]);
-        Vetor *n = p1p2->produtoVetorial(*p1p3)->normalizar();
+        Vetor* p1p2 = vetorDistancia(vertices[1], vertices[0]);
+        Vetor* p1p3 = vetorDistancia(vertices[2], vertices[0]);
+        Vetor* p2p3 = vetorDistancia(vertices[2], vertices[1]);
+        Vetor* p3p1 = vetorDistancia(vertices[0], vertices[2]);
+        Vetor* n = p1p2->produtoVetorial(*p1p3)->normalizar();
 
-        Plano *planoTriangulo = new Plano(vertices[0], *n);
+        Plano* planoTriangulo = new Plano(vertices[0], *n);
         vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
 
         if(pontoInt.size() == 0){
             return pontoInt;
         };
 
-        Vetor *p1p = vetorDistancia(pontoInt[0], vertices[0]);
-        Vetor *p2p = vetorDistancia(pontoInt[0], vertices[1]);
-        Vetor *p3p = vetorDistancia(pontoInt[0], vertices[2]);
+        Vetor* p1p = vetorDistancia(pontoInt[0], vertices[0]);
+        Vetor* p2p = vetorDistancia(pontoInt[0], vertices[1]);
+        Vetor* p3p = vetorDistancia(pontoInt[0], vertices[2]);
 
-        Vetor *p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
+        Vetor* p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
         double sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
         double sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
         double sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
@@ -398,18 +404,18 @@ class Cubo : public Objeto {
     Vetor direcao;
     double largura;
 
-    Triangulo *triangulo1;
-    Triangulo *triangulo2;
-    Triangulo *triangulo3;
-    Triangulo *triangulo4;
-    Triangulo *triangulo5;
-    Triangulo *triangulo6;
-    Triangulo *triangulo7;
-    Triangulo *triangulo8;
-    Triangulo *triangulo9;
-    Triangulo *triangulo10;
-    Triangulo *triangulo11;
-    Triangulo *triangulo12;
+    Triangulo* triangulo1;
+    Triangulo* triangulo2;
+    Triangulo* triangulo3;
+    Triangulo* triangulo4;
+    Triangulo* triangulo5;
+    Triangulo* triangulo6;
+    Triangulo* triangulo7;
+    Triangulo* triangulo8;
+    Triangulo* triangulo9;
+    Triangulo* triangulo10;
+    Triangulo* triangulo11;
+    Triangulo* triangulo12;
 
     public:
     Cubo() : Objeto() {}
@@ -420,14 +426,14 @@ class Cubo : public Objeto {
         this->direcao = direcao;
         
         double ml = largura/2;  //Meia Largura: ml
-        Ponto *p1 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() - ml);
-        Ponto *p2 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() + ml);
-        Ponto *p3 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() + ml);
-        Ponto *p4 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() - ml);
-        Ponto *p5 = new Ponto(this->centro.getX() - ml, this->centro.getY() - ml, this->centro.getZ() - ml);
-        Ponto *p6 = new Ponto(this->centro.getX() - ml, this->centro.getY() - ml, this->centro.getZ() + ml);
-        Ponto *p7 = new Ponto(this->centro.getX() + ml, this->centro.getY() - ml, this->centro.getZ() + ml);
-        Ponto *p8 = new Ponto(this->centro.getX() + ml, this->centro.getY() - ml, this->centro.getZ() - ml);
+        Ponto* p1 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() - ml);
+        Ponto* p2 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() + ml);
+        Ponto* p3 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() + ml);
+        Ponto* p4 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() - ml);
+        Ponto* p5 = new Ponto(this->centro.getX() - ml, this->centro.getY() - ml, this->centro.getZ() - ml);
+        Ponto* p6 = new Ponto(this->centro.getX() - ml, this->centro.getY() - ml, this->centro.getZ() + ml);
+        Ponto* p7 = new Ponto(this->centro.getX() + ml, this->centro.getY() - ml, this->centro.getZ() + ml);
+        Ponto* p8 = new Ponto(this->centro.getX() + ml, this->centro.getY() - ml, this->centro.getZ() - ml);
 
         this->adicionarVertice(*p1);
         this->adicionarVertice(*p2);
@@ -532,11 +538,11 @@ class Cilindro {
         this->altura = altura;
     }
 
-    Ponto *getBase() {
+    Ponto* getBase() {
         return &this->base;
     }
 
-    Vetor *getNormal() {
+    Vetor* getNormal() {
         return &this->normal;
     }
 
@@ -552,15 +558,15 @@ class Cilindro {
         vector<Ponto> pontosAtingidos;
 
         //Vetor v
-        Vetor *bPo = vetorDistancia(this->base,*reta.getPonto()); //(Po - B)
+        Vetor* bPo = vetorDistancia(this->base,*reta.getPonto()); //(Po - B)
         double aux = (*bPo * this->normal);                       //(Po - B).u  
-        Vetor *vetorAux = this->normal.multEscalar(aux);          //((Po - B).u).u
+        Vetor* vetorAux = this->normal.multEscalar(aux);          //((Po - B).u).u
         Vetor v = *bPo - *vetorAux;                               //Vetor v
 
         //Vetor w
-         double meuEscalar = *reta.getVetor() * this->normal;
-         vetorAux = this->normal.multEscalar(meuEscalar);
-         Vetor w = *reta.getVetor() -  *vetorAux;
+        double meuEscalar = *reta.getVetor() * this->normal;
+        vetorAux = this->normal.multEscalar(meuEscalar);
+        Vetor w = *reta.getVetor() -  *vetorAux;
 
         //Cálculo dos coeficientes da equação do segundo grau.
         double a = w * w;
@@ -611,11 +617,11 @@ class Cone {
         this->vertice = *somaPontoVetor(this->base, *(this->normal.multEscalar(this->altura)));
     }
 
-    Ponto *getBase() {
+    Ponto* getBase() {
         return &this->base;
     }
 
-    Vetor *getNormal() {
+    Vetor* getNormal() {
         return &this->normal;
     }
 
@@ -663,3 +669,74 @@ class Cone {
         return pontosAtingidos;
     }
 };
+
+
+// display function called by MainLoop(), gets executed every frame 
+void disp(void){
+	//Remove the old frame from the buffer
+	RenderAPI::BufferClear();
+
+	//Render using RayCast	
+	RenderAPI::BufferBind(vbo);
+	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
+	Color* colorBuffer;//TODO: your render function here
+	RenderAPI::MapBuffer(colorBuffer, width, height);
+
+	//End frame
+	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
+	RenderAPI::ReDisplay();//recall the display function
+}
+
+// mouse event handlers
+int lastX = 0, lastY = 0;
+int theButtonState = 0;
+int theModifierState = 0;
+
+// camera mouse controls in X and Y direction
+void motion(int x, int y)
+{
+	//TODO: your mouse moviment functions here
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	//TODO: your mouse functions here 
+}
+
+void keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+		case(' ')://TODO: your key name here
+			//TODO: your key function here
+		break;
+	}
+}
+
+void resize(int w, int h) {
+	RenderAPI::setView(w, h);
+}
+
+// Main.
+int main(int argc, char** argv) {
+    // Create API window
+	RenderAPI::StartRenderAPI(argc, argv, width, height);
+    
+	// functions for user interaction
+    RenderAPI::MouseFunc(mouse);
+    RenderAPI::MotionFunc(motion);
+    RenderAPI::KeyboardFunc(keyboard);
+	RenderAPI::ReshapeFunc(resize);
+
+	//function that will be called to control what will be displayed
+	RenderAPI::DisplayFunc(disp);
+
+	//create the pixel buffer
+	RenderAPI::CreateVBO(&vbo, width, height);
+	
+	//start render loop
+    RenderAPI::RenderLoop();
+
+    //if i'm here is because the render loop was stopped and i'm exiting the application
+	//delete the pixel buffer
+	RenderAPI::DeleteVBO(&vbo);
+}
+
