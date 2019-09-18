@@ -8,7 +8,7 @@
 
 #include "GL/glew.h"
 #include "GL/glut.h"
-//#include <GL/freeglut.h>
+#include "GL/freeglut.h"
 
 class Color {
     public:
@@ -148,8 +148,6 @@ namespace RenderAPI{
 	inline void ReDisplay() {
 		glutPostRedisplay();
 	}
-
-
 	//Event handlers
 	inline void KeyboardFunc(void(*callback)(unsigned char, int, int))		{ glutKeyboardFunc(callback); }
 	inline void ReshapeFunc(void(*callback)(int, int))						{ glutReshapeFunc(callback); }

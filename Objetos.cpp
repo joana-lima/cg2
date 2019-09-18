@@ -1,14 +1,9 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
-#include "RenderAPI.h"
+// #include "RenderAPI.h"
 
 using namespace std;
-
-//pixel buffer
-RenderAPI::VertexBuffer vbo;
-
-const int width = 512, height = 512;
 
 class Ponto {
     protected:
@@ -671,72 +666,78 @@ class Cone {
 };
 
 
-// display function called by MainLoop(), gets executed every frame 
-void disp(void){
-	//Remove the old frame from the buffer
-	RenderAPI::BufferClear();
+// //pixel buffer
+// RenderAPI::VertexBuffer vbo;
 
-	//Render using RayCast	
-	RenderAPI::BufferBind(vbo);
-	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
-	Color* colorBuffer;//TODO: your render function here
-	RenderAPI::MapBuffer(colorBuffer, width, height);
+// const int width = 512, height = 512;
 
-	//End frame
-	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
-	RenderAPI::ReDisplay();//recall the display function
-}
 
-// mouse event handlers
-int lastX = 0, lastY = 0;
-int theButtonState = 0;
-int theModifierState = 0;
+// // display function called by MainLoop(), gets executed every frame 
+// void disp(void){
+// 	//Remove the old frame from the buffer
+// 	RenderAPI::BufferClear();
 
-// camera mouse controls in X and Y direction
-void motion(int x, int y)
-{
-	//TODO: your mouse moviment functions here
-}
+// 	//Render using RayCast	
+// 	RenderAPI::BufferBind(vbo);
+// 	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
+// 	Color* colorBuffer;//TODO: your render function here
+// 	RenderAPI::MapBuffer(colorBuffer, width, height);
 
-void mouse(int button, int state, int x, int y)
-{
-	//TODO: your mouse functions here 
-}
+// 	//End frame
+// 	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
+// 	RenderAPI::ReDisplay();//recall the display function
+// }
 
-void keyboard(unsigned char key, int x, int y) {
-	switch (key) {
-		case(' ')://TODO: your key name here
-			//TODO: your key function here
-		break;
-	}
-}
+// // mouse event handlers
+// int lastX = 0, lastY = 0;
+// int theButtonState = 0;
+// int theModifierState = 0;
 
-void resize(int w, int h) {
-	RenderAPI::setView(w, h);
-}
+// // camera mouse controls in X and Y direction
+// void motion(int x, int y)
+// {
+// 	//TODO: your mouse moviment functions here
+// }
 
-// Main.
-int main(int argc, char** argv) {
-    // Create API window
-	RenderAPI::StartRenderAPI(argc, argv, width, height);
+// void mouse(int button, int state, int x, int y)
+// {
+// 	//TODO: your mouse functions here 
+// }
+
+// void keyboard(unsigned char key, int x, int y) {
+// 	switch (key) {
+// 		case(' ')://TODO: your key name here
+// 			//TODO: your key function here
+// 		break;
+// 	}
+// }
+
+// void resize(int w, int h) {
+// 	RenderAPI::Reshape(w, h);
+// }
+
+// // Main.
+// int main(int argc, char** argv) {
+//     // Create API window
+// 	RenderAPI::StartRenderAPI(argc, argv, width, height);
     
-	// functions for user interaction
-    RenderAPI::MouseFunc(mouse);
-    RenderAPI::MotionFunc(motion);
-    RenderAPI::KeyboardFunc(keyboard);
-	RenderAPI::ReshapeFunc(resize);
+// 	// functions for user interaction
+//     RenderAPI::MouseFunc(mouse);
+//     RenderAPI::MotionFunc(motion);
+//     RenderAPI::KeyboardFunc(keyboard);
+// 	RenderAPI::ReshapeFunc(resize);
 
-	//function that will be called to control what will be displayed
-	RenderAPI::DisplayFunc(disp);
+// 	//function that will be called to control what will be displayed
+// 	RenderAPI::DisplayFunc(disp);
 
-	//create the pixel buffer
-	RenderAPI::CreateVBO(&vbo, width, height);
+// 	//create the pixel buffer
+// 	RenderAPI::CreateVBO(&vbo, width, height);
 	
-	//start render loop
-    RenderAPI::RenderLoop();
+// 	//start render loop
+//     RenderAPI::RenderLoop();
 
-    //if i'm here is because the render loop was stopped and i'm exiting the application
-	//delete the pixel buffer
-	RenderAPI::DeleteVBO(&vbo);
-}
+//     //if i'm here is because the render loop was stopped and i'm exiting the application
+// 	//delete the pixel buffer
+// 	RenderAPI::DeleteVBO(&vbo);
+// }
 
