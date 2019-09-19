@@ -1,9 +1,15 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
-// #include "RenderAPI.h"
+//#include "RenderAPI.h"
+#include <bits/stdc++.h> 
+#include <stdlib.h>
+#include <stdio.h> 
 
 using namespace std;
+
+//pixel buffer
+//RenderAPI::VertexBuffer vbo;
 
 class Matriz {
     protected:
@@ -71,6 +77,8 @@ class Matriz {
 
         }
 };
+
+const int width = 512, height = 512;
 
 class Ponto {
     protected:
@@ -187,6 +195,14 @@ class Vetor: public Ponto {
         return res;
     }
 
+    Vetor elemMult (Vetor obj) {
+        Vetor res;
+        res.x = x * obj.x;
+        res.y = y * obj.y;
+        res.z = z * obj.z;
+        return res;
+    }
+
     double operator * (Vetor const &obj) {
         double resultado;
         resultado = x*obj.x + y*obj.y + z*obj.z;
@@ -249,6 +265,68 @@ vector<double> equacaoSegundoGrau(double a, double b, double c) {
     }
 }
 
+class Reta {
+    protected:
+    Ponto ponto;
+    Vetor vetor;
+
+    public:
+    Reta(Ponto ponto, Vetor vetor) {
+        this->ponto = ponto;
+        this->vetor = *vetor.normalizar();
+    }
+
+    Ponto* getPonto() {
+        return &this->ponto;
+    }
+
+    Vetor* getVetor() {
+        return &this->vetor;
+    }
+
+    void print() {
+        cout << "----Reta----" << endl;
+        ponto.print();
+        vetor.print();
+    }
+
+    Ponto* pontoAtingido(double k) {
+        Ponto* atingido = somaPontoVetor(this->ponto, *(this->vetor.multEscalar(k)));
+        return atingido;
+    }
+};
+
+class Observador{
+    private:
+        Ponto posicao;
+        Ponto lookat;
+        Ponto viewup;
+
+    public:
+        Observador(Ponto posicao, Ponto lookat, Ponto viewup){
+            this->posicao = posicao;
+            this->lookat = lookat;
+            this->viewup = viewup;
+        }
+
+        Ponto* getPosicao(){
+            return &posicao;
+        }
+        
+        Vetor getI(){
+            return *(*(*vetorDistancia(posicao, viewup)).produtoVetorial(getK())).normalizar();
+        }
+
+        Vetor getJ(){
+            return *getK().produtoVetorial(getI());
+        }
+
+        Vetor getK(){
+            return *(*vetorDistancia(lookat, posicao)).normalizar();
+        }
+};
+
+
 class Objeto {
     protected:
     int id = 0;
@@ -256,6 +334,7 @@ class Objeto {
     vector<vector<Ponto>> arestas;
     vector<vector<Ponto>> faces;
     bool visibilidade;
+    Vetor material;
 
     public:
     Objeto() {
@@ -264,6 +343,10 @@ class Objeto {
         this->faces = {};
         this->visibilidade = true;
         this->id++;
+    }
+
+    void setMaterial(Vetor material){
+        this->material = material;
     }
 
     void print(){
@@ -334,40 +417,18 @@ class Objeto {
         return this->faces;
     }
 
+    Vetor getMaterial(){
+        return this->material;
+    }
+
+    virtual Objeto* transforma(Observador obs){}
+    virtual Vetor* getNormal(Ponto p){}
+    virtual vector<Ponto> intRaio(Reta reta){}
+
 };
 
-class Reta {
-    protected:
-    Ponto ponto;
-    Vetor vetor;
 
-    public:
-    Reta(Ponto ponto, Vetor vetor) {
-        this->ponto = ponto;
-        this->vetor = *vetor.normalizar();
-    }
-
-    Ponto* getPonto() {
-        return &this->ponto;
-    }
-
-    Vetor* getVetor() {
-        return &this->vetor;
-    }
-
-    void print() {
-        cout << "----Reta----" << endl;
-        ponto.print();
-        vetor.print();
-    }
-
-    Ponto* pontoAtingido(double k) {
-        Ponto* atingido = somaPontoVetor(this->ponto, *(this->vetor.multEscalar(k)));
-        return atingido;
-    }
-};
-
-class Plano {
+class Plano : public Objeto{
     protected:
     Ponto ponto;
     Vetor normal;
@@ -406,6 +467,10 @@ class Plano {
             pontos.push_back(*reta.pontoAtingido(tInt));
             return pontos;
         }
+    }
+
+    Objeto* transforma(Observador obs){
+        
     }
 };
 
@@ -455,6 +520,14 @@ class Triangulo : public Objeto {
             pontoInt.clear();
             return pontoInt;
         }
+    }
+
+    Vetor* getNormal(Ponto p){
+
+    }
+
+    Objeto* transforma(Observador obs){
+        
     }
 
     
@@ -583,9 +656,18 @@ class Cubo : public Objeto {
 
         return pontosIntRaioOutput;
     }
+    
+    Objeto* transforma(Observador obs){
+        
+    }
+
+    Vetor* getNormal(Ponto p){
+
+    }
+
 };
 
-class Cilindro {
+class Cilindro : public Objeto{
     protected:
     Ponto base;
     Vetor normal;
@@ -660,9 +742,19 @@ class Cilindro {
 
     }
 
+
+    Objeto* transforma(Observador obs){
+        
+    }
+
+    Vetor* getNormal(Ponto p){
+
+    }
+
+
 };
 
-class Cone {
+class Cone : public Objeto {
     protected:
     Ponto base;
     Ponto vertice;
@@ -730,81 +822,278 @@ class Cone {
         }
         return pontosAtingidos;
     }
+
+
+    Objeto* transforma(Observador obs){
+        
+    }
+
+    Vetor* getNormal(Ponto p){
+        
+    }
+
+
 };
 
 
-// //pixel buffer
-// RenderAPI::VertexBuffer vbo;
+class Luz{
+    private:
+        Vetor intensidade;
+        Ponto posicao;
 
-// const int width = 512, height = 512;
+    public:
+        Luz(Ponto posicao, Vetor intensidade){
+            this->posicao =  posicao;
+            this->intensidade = intensidade;
+        }
+
+        Ponto getPosicao(){
+            return this->posicao;
+        }
+
+        Vetor getIntensidade(){
+            return this->intensidade;
+        }
+
+        Luz* transforma(Observador obs){
+
+        }
+
+};
+
+class Mundo{
+    private:
+        vector<Objeto> objetos;
+        vector<Luz> luzes;
+        Vetor luz_ambiente;
+
+    public:
+        Mundo(Vetor luz_ambiente){
+            this->luz_ambiente = luz_ambiente;
+        }
+
+        void add(Objeto obj){
+            objetos.push_back(obj);
+        }
+
+        void addLuz(Luz luz){
+            luzes.push_back(luz);
+        }
+
+        vector<Luz> getLuzes(){
+            return luzes;
+        }
+
+        vector<Objeto> getObjetos(){
+            return objetos;
+        }
+
+        Vetor getLuzAmbiente(){
+            return luz_ambiente;
+        }
+
+        Mundo* obsMundo(Observador obs){
+            Mundo *obsMundo = new Mundo(luz_ambiente);
+
+            for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
+                Objeto ob = *((Objeto)(*i)).transforma(obs);
+                obsMundo->add(ob);
+            } 
+
+            for (auto i = luzes.cbegin(); i != luzes.cend(); ++i){
+                Luz ob = *((Luz)(*i)).transforma(obs);
+                obsMundo->addLuz(ob);
+            } 
 
 
-// // display function called by MainLoop(), gets executed every frame 
-// void disp(void){
-// 	//Remove the old frame from the buffer
-// 	RenderAPI::BufferClear();
+           return obsMundo;
+        }
 
-// 	//Render using RayCast	
-// 	RenderAPI::BufferBind(vbo);
-// 	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
-// 	Color* colorBuffer;//TODO: your render function here
-// 	RenderAPI::MapBuffer(colorBuffer, width, height);
+};
 
-// 	//End frame
-// 	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
-// 	RenderAPI::ReDisplay();//recall the display function
-// }
 
-// // mouse event handlers
-// int lastX = 0, lastY = 0;
-// int theButtonState = 0;
-// int theModifierState = 0;
+class Pixel{
+    private:   
+    vector<pair <int, Objeto> > solutions;
+    Reta* reta;
+    Mundo* obsMundo;
 
-// // camera mouse controls in X and Y direction
-// void motion(int x, int y)
-// {
-// 	//TODO: your mouse moviment functions here
-// }
+    public:
+        Pixel(Ponto center, Mundo* obsMundo){
+            this->obsMundo = obsMundo;
+            this->reta = new Reta( *new Ponto(0,0,0), *vetorDistancia(*new Ponto(0,0,0), center));
+            vector<Objeto> objetos = (*obsMundo).getObjetos();
+            for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
+                Objeto ob = ((Objeto)(*i));
+                if(ob.getVisibilidade() == true){
 
-// void mouse(int button, int state, int x, int y)
-// {
-// 	//TODO: your mouse functions here 
-// }
+                    vector<Ponto> pontos_intersec = ob.intRaio( *reta );
+                    vector<double> t_intersec;
 
-// void keyboard(unsigned char key, int x, int y) {
-// 	switch (key) {
-// 		case(' ')://TODO: your key name here
-// 			//TODO: your key function here
-// 		break;
-// 	}
-// }
+                    for (auto it_pontos = pontos_intersec.cbegin(); it_pontos != pontos_intersec.cend(); ++it_pontos)
+                        t_intersec.push_back( (vetorDistancia( (*new Ponto(0,0,0)), (Ponto)(*it_pontos) ) )->calcularNorma() );
 
-// void resize(int w, int h) {
-// 	RenderAPI::Reshape(w, h);
-// }
+                    for (auto t = t_intersec.cbegin(); t != t_intersec.cend(); ++t)
+                        if((*t)>0) solutions.push_back( make_pair((*t),ob) ); 
+                }
+            }
 
-// // Main.
-// int main(int argc, char** argv) {
-//     // Create API window
-// 	RenderAPI::StartRenderAPI(argc, argv, width, height);
+            sort(solutions.begin(), solutions.end(), [](pair<int,Objeto> a, pair<int,Objeto> b){
+                return a.first < b.first;
+            });
+        }
+
+        Vetor getSolution(){
+            Vetor *Id = new Vetor(0,0,0);
+            Vetor *Is = new Vetor(0,0,0);
+            Vetor Ia = (*obsMundo).getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
+            
+            vector<Luz> luzes = (*obsMundo).getLuzes();
+            for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
+                Luz luz= (Luz)(*it_luzes);
+                
+                Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao())).normalizar();
+                double fd = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first)) * l;
+
+                //Vetor r = ??;
+                //double fs = *(*vetorDistancia(*reta.pontoAtingido(solutions[0].first), *new Ponto(0,0,0))).normalizar() * r;
+
+                *Id = *Id + *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fd);
+                //*Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
+            }
+             
+            return *new Vetor(0,0,0);
+            //return Ia+*Id+*Is;
+        }
+
+
+};
+
+
+class Painel{
+    private:
+        double distancia;
+        double lado;
+        int pixels;
+        Mundo* obsMundo;
+        Vetor** mtrx;
+
+    public:
+        Painel(Mundo* obsMundo, double distancia, double lado, int pixels){
+            this->obsMundo = obsMundo;
+            this->distancia = distancia;
+            this->lado = lado;
+            this->pixels = pixels;
+
+
+            mtrx = (Vetor**) malloc(sizeof(Vetor*) * pixels);
+            for (int i = 0; i < pixels; ++i){
+                mtrx[i] = (Vetor*) malloc(sizeof(Vetor*) * pixels);
+                for (int j = 0; j < pixels; ++j)
+                    mtrx[i][j] = *new Vetor(255,255,255); // cor default;!!                
+            }
+
+
+            for (int i = 0; i < pixels; i++){
+                for (int j = 0; j < pixels; j++){
+                    mtrx[i][j] = (*new Pixel(*getCenter(i,j), obsMundo)).getSolution(); 
+                }
+            }
+
+        }
+
+        Ponto* getCenter(int i, int j){
+            double delx = lado/pixels, dely = lado/pixels;
+            double x = -lado/2 + delx/2 + j*delx;
+            double y = lado/2 - dely/2 - i*dely;
+            double z = -distancia;
+            return new Ponto(x,y,z);
+        }
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+// display function called by MainLoop(), gets executed every frame 
+void disp(void){
+	//Remove the old frame from the buffer
+	RenderAPI::BufferClear();
+
+	//Render using RayCast	
+	RenderAPI::BufferBind(vbo);
+	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
+	Color* colorBuffer;//TODO: your render function here
+	RenderAPI::MapBuffer(colorBuffer, width, height);
+
+	//End frame
+	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
+	RenderAPI::ReDisplay();//recall the display function
+}
+
+// mouse event handlers
+int lastX = 0, lastY = 0;
+int theButtonState = 0;
+int theModifierState = 0;
+
+// camera mouse controls in X and Y direction
+void motion(int x, int y)
+{
+	//TODO: your mouse moviment functions here
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	//TODO: your mouse functions here 
+}
+
+void keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+		case(' ')://TODO: your key name here
+			//TODO: your key function here
+		break;
+	}
+}
+
+void resize(int w, int h) {
+	RenderAPI::setView(w, h);
+}
+
+// Main.
+int main(int argc, char** argv) {
+    // Create API window
+	RenderAPI::StartRenderAPI(argc, argv, width, height);
     
-// 	// functions for user interaction
-//     RenderAPI::MouseFunc(mouse);
-//     RenderAPI::MotionFunc(motion);
-//     RenderAPI::KeyboardFunc(keyboard);
-// 	RenderAPI::ReshapeFunc(resize);
+	// functions for user interaction
+    RenderAPI::MouseFunc(mouse);
+    RenderAPI::MotionFunc(motion);
+    RenderAPI::KeyboardFunc(keyboard);
+	RenderAPI::ReshapeFunc(resize);
 
-// 	//function that will be called to control what will be displayed
-// 	RenderAPI::DisplayFunc(disp);
+	//function that will be called to control what will be displayed
+	RenderAPI::DisplayFunc(disp);
 
-// 	//create the pixel buffer
-// 	RenderAPI::CreateVBO(&vbo, width, height);
+	//create the pixel buffer
+	RenderAPI::CreateVBO(&vbo, width, height);
 	
-// 	//start render loop
-//     RenderAPI::RenderLoop();
+	//start render loop
+    RenderAPI::RenderLoop();
 
-//     //if i'm here is because the render loop was stopped and i'm exiting the application
-// 	//delete the pixel buffer
-// 	RenderAPI::DeleteVBO(&vbo);
-// }
+    //if i'm here is because the render loop was stopped and i'm exiting the application
+	//delete the pixel buffer
+	RenderAPI::DeleteVBO(&vbo);
+}
 
+*/
