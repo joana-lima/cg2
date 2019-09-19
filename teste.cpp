@@ -4,6 +4,34 @@ using namespace std;
 
 int main() {
 
+    cout << "\n-----------Teste de Matriz------------" << endl;
+    vector<vector<double>> a = {{2, 3},
+                                {1, 0},
+                                {4, 5}};
+
+    vector<vector<double>> b = {{3, 1},
+                                {2, 4}};
+
+    Matriz* A = new Matriz(a);
+    Matriz* B = new Matriz(b);
+
+    A->print();
+    cout << endl;
+
+    B->print();
+    cout << endl;
+
+    Matriz* C = new Matriz(a.size(), b[0].size());
+    C = A->produto(B);
+
+    C->print(); //deve printar:
+                // 12 14 
+                // 3  1
+                // 22 24
+    cout << endl;
+
+    
+
     double resultado;                    //Escalar qualquer
     Ponto *ponto1 = new Ponto(1,1,1);
     Ponto *ponto2;

@@ -5,6 +5,72 @@
 
 using namespace std;
 
+class Matriz {
+    protected:
+        vector<vector<double>> matriz = {};
+        int linhas;
+        int colunas;
+
+    public:
+        Matriz(int nLinhas, int nColunas){
+            this->linhas = nLinhas;
+            this->colunas = nColunas;
+
+            vector<double> linhas;
+            vector<vector<double>> linhasComColunas;
+
+            for(int i = 0; i < nLinhas; i++){
+                for(int j = 0; j < nColunas; j++){
+                    linhas.push_back(0.0);
+                };
+                linhasComColunas.push_back(linhas);
+                linhas.clear();
+            };
+
+            this->matriz = linhasComColunas;
+        }
+
+        Matriz(vector<vector<double>> matriz){
+            this->matriz = matriz;
+            this->linhas = matriz.size();
+            this->colunas = matriz[0].size();
+        }
+
+        void inserirValor(int linha, int coluna, double valor){
+            this->matriz[linha, coluna] = {valor};
+        }
+
+        void print(){
+            for(int i = 0; i < this->matriz.size(); i++){
+                for(int j = 0; j < this->matriz[0].size(); j++){
+                    cout << this->matriz[i][j] << " ";
+                };
+                cout << endl;
+            };
+        }
+
+        Matriz* produto(Matriz* B){
+            Matriz* A = this;
+            Matriz* C = new Matriz(A->linhas, B->colunas);
+
+            if(A->colunas != B->linhas){
+                cout << "\nNão é permitido multiplicar as matrizes dadas.\n";
+            } else {
+
+                for(int i = 0; i < A->linhas; i++){
+                    for(int j = 0; j < B->colunas; j++){
+                        for(int k = 0; k < A->colunas; k++){
+                            C->matriz[i][j] = C->matriz[i][j] + (A->matriz[i][k] * B->matriz[k][j]);
+                        };
+                    };
+                };
+                
+            }
+
+            return C;
+        }
+};
+
 class Ponto {
     protected:
         int id = 0;
