@@ -51,11 +51,11 @@ class Matriz {
 
         Matriz* produto(Matriz* B){
             Matriz* A = this;
-            Matriz* C = new Matriz(A->linhas, B->colunas);
 
             if(A->colunas != B->linhas){
                 cout << "\nNão é permitido multiplicar as matrizes dadas.\n";
             } else {
+                Matriz* C = new Matriz(A->linhas, B->colunas);
 
                 for(int i = 0; i < A->linhas; i++){
                     for(int j = 0; j < B->colunas; j++){
@@ -65,9 +65,9 @@ class Matriz {
                     };
                 };
                 
+                return C;
             }
 
-            return C;
         }
 };
 
