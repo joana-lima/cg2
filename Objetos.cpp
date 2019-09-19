@@ -54,6 +54,7 @@ class Matriz {
 
             if(A->colunas != B->linhas){
                 cout << "\nNão é permitido multiplicar as matrizes dadas.\n";
+                return NULL;
             } else {
                 Matriz* C = new Matriz(A->linhas, B->colunas);
 

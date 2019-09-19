@@ -21,8 +21,7 @@ int main() {
     B->print();
     cout << endl;
 
-    Matriz* C = new Matriz(a.size(), b[0].size());
-    C = A->produto(B);
+    Matriz* C = A->produto(B);
 
     C->print(); //deve printar:
                 // 12 14 
