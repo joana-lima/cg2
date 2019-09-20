@@ -662,7 +662,6 @@ class Cubo : public Objeto {
 
 };
 
-<<<<<<< HEAD
 class Esfera {  //TODO Testar
     protected:
     Ponto centro;
@@ -709,10 +708,7 @@ class Esfera {  //TODO Testar
     }
 };
 
-class Cilindro {
-=======
 class Cilindro : public Objeto{
->>>>>>> origin/master
     protected:
     Ponto base;
     Vetor normal;
