@@ -52,7 +52,7 @@ class Matriz {
             };
         }
 
-        Matriz* produto(Matriz* B){
+        Matriz* opearator * (Matriz* B){
             Matriz* A = this;
 
             if(A->colunas != B->linhas){
