@@ -585,6 +585,52 @@ class Cubo : public Objeto {
     }
 };
 
+class Esfera {  //TODO Testar
+    protected:
+    Ponto centro;
+    double raio;
+
+    public:
+    Esfera(Ponto centro, double raio){
+        this->centro = centro;
+        this->raio = raio;
+    }
+
+    Ponto getCentro(){
+        return this->centro;
+    }
+
+    double getRaio(){
+        return this->raio;
+    }
+
+    bool pontoPertence(Ponto p){
+        Vetor* vetor = vetorDistancia(p, centro);
+        double norma = vetor->calcularNorma();
+        norma *= norma;
+
+        if(norma == (this->raio * this->raio)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    vector<Ponto> intRaio(Reta raio){
+        Vetor* vetorAux = vetorDistancia(*raio.getPonto(), this->getCentro());
+        double a = raio.getVetor()->produtoEscalar(*raio.getVetor());
+        double b = vetorAux->produtoEscalar(*raio.getVetor());
+        double c = vetorAux->produtoEscalar(*vetorAux) - this->getRaio()*this->getRaio();
+
+        vector<double> tIntersecao = equacaoSegundoGrau(a, 2*b, c);
+        vector<Ponto> pontos;
+        pontos.push_back(*raio.pontoAtingido(tIntersecao[0]));
+        pontos.push_back(*raio.pontoAtingido(tIntersecao[1]));
+
+        return pontos;
+    }
+};
+
 class Cilindro {
     protected:
     Ponto base;
