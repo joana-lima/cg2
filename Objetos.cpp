@@ -921,7 +921,13 @@ class Cone : public Objeto {
         }
 
         Vetor* getNormal(Ponto p){
-            
+            Vetor* Nc = &this->normal; //vetor normal na base do cone
+            Ponto* V = &this->vertice; //ponto do vértice do cone
+            Vetor* Vg = vetorDistancia(*V, p); //vetor do ponto pInt(p) até o vértice do cone, ou seja, vetor paralelo à geratriz do cone
+            Vetor* Vt = Nc->produtoVetorial(*Vg); //vetor tangente ao cone no ponto pInt(p)
+            Vetor* normal = Vt->produtoVetorial(*Vg); //vetor perpendicular à geratriz do cone
+
+            return normal;
         }
 
 
