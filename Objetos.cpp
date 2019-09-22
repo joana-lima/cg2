@@ -1004,7 +1004,7 @@ class Pixel{
         Pixel(Ponto center, Mundo* obsMundo){
             this->obsMundo = obsMundo;
             this->reta = new Reta( *new Ponto(0,0,0), *vetorDistancia(*new Ponto(0,0,0), center));
-            vector<Objeto> objetos = (*obsMundo).getObjetos();
+            vector<Objeto> objetos = obsMundo->getObjetos();
             for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
                 Objeto ob = ((Objeto)(*i));
                 if(ob.getVisibilidade() == true){
@@ -1026,11 +1026,11 @@ class Pixel{
         }
 
         Vetor getSolution(){
-            Vetor *Id = new Vetor(0,0,0);
-            Vetor *Is = new Vetor(0,0,0);
-            Vetor Ia = (*obsMundo).getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
+            Vetor* Id = new Vetor(0,0,0);
+            Vetor* Is = new Vetor(0,0,0);
+            Vetor* Ia = &obsMundo->getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
             
-            vector<Luz> luzes = (*obsMundo).getLuzes();
+            vector<Luz> luzes = obsMundo->getLuzes();
             for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
                 Luz luz= (Luz)(*it_luzes);
                 
