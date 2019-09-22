@@ -749,6 +749,11 @@ class Esfera {  //TODO Testar
 
             return pontos;
         }
+
+        Vetor* getNormal(Ponto p){
+            Vetor* normal = vetorDistancia(p, this->centro)->normalizar();
+            return normal;
+        }
 };
 
 class Cilindro : public Objeto{
