@@ -1022,26 +1022,27 @@ class Pixel{
         }
 
         Vetor getSolution(){
-            Vetor* Id = new Vetor(0,0,0);
-            Vetor* Is = new Vetor(0,0,0);
-            Vetor* Ia = &obsMundo->getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
+            Vetor *Id = new Vetor(0,0,0);
+            Vetor *Is = new Vetor(0,0,0);
+            Vetor Ia = (*obsMundo).getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
             
-            vector<Luz> luzes = obsMundo->getLuzes();
+            vector<Luz> luzes = (*obsMundo).getLuzes();
             for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
                 Luz luz= (Luz)(*it_luzes);
                 
+                Vetor normal = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first));
                 Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao())).normalizar();
-                double fd = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first)) * l;
+                double fd = normal * l;
 
-                //Vetor r = ??;
-                //double fs = *(*vetorDistancia(*reta.pontoAtingido(solutions[0].first), *new Ponto(0,0,0))).normalizar() * r;
+
+                Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2);
+                double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), *new Ponto(0,0,0))).normalizar() * r;
 
                 *Id = *Id + *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fd);
-                //*Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
+                *Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
             }
              
-            return *new Vetor(0,0,0);
-            //return Ia+*Id+*Is;
+            return Ia+*Id+*Is;
         }
 
 
