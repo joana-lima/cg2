@@ -260,10 +260,6 @@ class Vetor: public Ponto {
             
             return resultado;
         }
-
-        void print() {
-            cout << "Vetor - X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << endl;
-        }
 };
 
 Ponto* somaPontoVetor(Ponto ponto, Vetor vetor) {
