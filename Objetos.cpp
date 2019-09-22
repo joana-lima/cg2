@@ -557,7 +557,11 @@ class Triangulo : public Objeto {
         }
 
         Vetor* getNormal(Ponto p){
+            Vetor* p1p2 = vetorDistancia(vertices[1], vertices[0]);
+            Vetor* p1p3 = vetorDistancia(vertices[2], vertices[0]);
+            Vetor* normal = p1p2->produtoVetorial(*p1p3)->normalizar();
 
+            return normal;
         }
 
         Objeto* transforma(Observador obs){
