@@ -837,7 +837,10 @@ class Cilindro : public Objeto{
         }
 
         Vetor* getNormal(Ponto p){
+            Ponto projecaoPIntEixo = *somaPontoVetor(this->base, *(vetorDistancia(p, this->base)->produtoVetorial(this->normal)->produtoVetorial(this->normal)));
+            Vetor* normal = vetorDistancia(p, projecaoPIntEixo)->normalizar();
 
+            return normal;
         }
 
 
