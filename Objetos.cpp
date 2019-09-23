@@ -300,31 +300,6 @@ vector<double> equacaoSegundoGrau(double a, double b, double c) {
     }
 }
 
-
-Ponto* convertePontoCamera(Observador obs, Ponto ponto) {
-
-    Ponto novoPonto1 = ponto * obs.getI();
-    Ponto novoPonto2 = ponto * obs.getJ();
-    Ponto novoPonto3 = ponto * obs.getK();
-    
-
-    vector<vector<double>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
-
-    vector<double> primeiraLinha = {obs.getI.getX(), obs.getI.getY(), obs.getI.getZ(), novoPonto1};
-    vector<double> segundalinha = {obs.getJ.getX(), obs.getJ.getY(), obs.getJ.getZ(), novoPonto2};
-    vector<double> terceiraLinha = {obs.getK.getX(), obs.getK.getY(), obs.getK.getZ(),novoPonto3};
-    vector<double> quartalinha = {0,0,0,1};
-
-    vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
-
-    Matriz *matriz1 = new Matriz(pontoATranformar);
-    Matriz *matriz2 = new Matriz(matrizDeTransformacao);
-
-    Matriz *produto = matriz1->produto(matriz2);
-
-    return produto;
-}
-
 class Reta {
     protected:
         Ponto ponto;
@@ -361,12 +336,29 @@ class Observador{
         Ponto posicao;
         Ponto lookat;
         Ponto viewup;
+        Matriz *matriz;
 
     public:
         Observador(Ponto posicao, Ponto lookat, Ponto viewup){
             this->posicao = posicao;
             this->lookat = lookat;
             this->viewup = viewup;
+
+            Vetor i = this->getI();
+            Vetor j = this->getJ();
+            Vetor k = this->getK();
+
+            double a = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * i);
+            double b = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * j);
+            double c = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * k);
+
+            vector<double> primeiraLinha = {i.getX(), i.getY(), i.getZ(), a};
+            vector<double> segundalinha  = {j.getX(), j.getY(), j.getZ(), b};
+            vector<double> terceiraLinha = {k.getX(), k.getY(), k.getZ(), c};
+            vector<double> quartalinha = {0,0,0,1};
+
+            vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
+            this->matriz = new Matriz(matrizDeTransformacao);
         }
 
         Ponto* getPosicao(){
@@ -383,6 +375,13 @@ class Observador{
 
         Vetor getK(){
             return *(*vetorDistancia(lookat, posicao)).normalizar();
+        }
+
+
+        Ponto converte(Ponto ponto){
+            vector<vector<double>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
+            Matriz* resultado = matriz->produto(new Matriz(pontoAtransformar));
+            //return *new Ponto(resultado[0][0], resultado[1][0], resultado[2][0]);
         }
 };
 
@@ -924,7 +923,7 @@ class Cone : public Objeto {
             Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
         
             //Cálculo dos coeficientes da equaçao do segundo grau
-            double a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal)) - ((*reta.getVetor() * *reta.getVetor())* pow(getCossenoGeratriz, 2));
+            double a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal)) - ((*reta.getVetor() * *reta.getVetor())* pow(this->getCossenoGeratriz(), 2));
             double b = (v * *reta.getVetor()) * pow(this->getCossenoGeratriz(),2) - 
                     (v * this->normal) * (*reta.getVetor() * this->normal);
             double c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
@@ -976,12 +975,12 @@ class Luz{
             this->intensidade = intensidade;
         }
 
-        Ponto getPosicao(){
-            return this->posicao;
+        Ponto* getPosicao(){
+            return &posicao;
         }
 
         Vetor getIntensidade(){
-            return this->intensidade;
+            return intensidade;
         }
 
         Luz* transforma(Observador obs){
@@ -1049,11 +1048,13 @@ class Pixel{
 
     public:
         Pixel(Ponto center, Ponto obs, Mundo* obsMundo){
+
             this->obsMundo = obsMundo;
             this->center = center;
             this->reta = new Reta( obs, *vetorDistancia(obs, center));
             this->obs = obs;
             vector<Objeto> objetos = (*obsMundo).getObjetos();
+            
             for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
                 Objeto ob = ((Objeto)(*i));
                 if(ob.getVisibilidade() == true){
@@ -1088,10 +1089,10 @@ class Pixel{
             for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
                 Luz luz= (Luz)(*it_luzes);
 
-                if((*new Pixel(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao(), obsMundo)).getSolutions()[0].second.getId()==solutions[0].second.getId()){
+                if((*new Pixel(*(*reta).pontoAtingido(solutions[0].first), *luz.getPosicao(), obsMundo)).getSolutions()[0].second.getId()==solutions[0].second.getId()){
 
                     Vetor normal = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first));
-                    Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao())).normalizar();
+                    Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), *luz.getPosicao())).normalizar();
                     double fd = normal * l;
                     if(fd < 0) fd = 0;
 
@@ -1141,7 +1142,9 @@ class Painel{
 
             for (int i = 0; i < pixels; i++){
                 for (int j = 0; j < pixels; j++){
-                    mtrx[i][j] = (*new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo)).getColor(); 
+                    Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
+                    mtrx[i][j] = pixel->getColor();
+                    pixel->getSolutions()[0].second.adicionarVertice(*getCenter(i,j)); 
                 }
             }
 
