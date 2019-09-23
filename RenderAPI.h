@@ -54,7 +54,7 @@ namespace RenderAPI{
 		}
 	}
 
-	inline void Reshape(int width, int height) {
+	inline void setView(int width, int height) {
 		glViewport(0, 0, width, height);
 		
 		glMatrixMode(GL_PROJECTION);
