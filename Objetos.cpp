@@ -2,7 +2,7 @@
 #include <math.h>
 #include <vector>
 //#include "RenderAPI.h"
-// #include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 #include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
@@ -300,6 +300,31 @@ vector<double> equacaoSegundoGrau(double a, double b, double c) {
     }
 }
 
+
+Ponto* convertePontoCamera(Observador obs, Ponto ponto) {
+
+    Ponto novoPonto1 = ponto * obs.getI();
+    Ponto novoPonto2 = ponto * obs.getJ();
+    Ponto novoPonto3 = ponto * obs.getK();
+    
+
+    vector<vector<double>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
+
+    vector<double> primeiraLinha = {obs.getI.getX(), obs.getI.getY(), obs.getI.getZ(), novoPonto1};
+    vector<double> segundalinha = {obs.getJ.getX(), obs.getJ.getY(), obs.getJ.getZ(), novoPonto2};
+    vector<double> terceiraLinha = {obs.getK.getX(), obs.getK.getY(), obs.getK.getZ(),novoPonto3};
+    vector<double> quartalinha = {0,0,0,1};
+
+    vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
+
+    Matriz *matriz1 = new Matriz(pontoATranformar);
+    Matriz *matriz2 = new Matriz(matrizDeTransformacao);
+
+    Matriz *produto = matriz1->produto(matriz2);
+
+    return produto;
+}
+
 class Reta {
     protected:
         Ponto ponto;
@@ -509,6 +534,7 @@ class Plano : public Objeto{
         }
 
         Objeto* transforma(Observador obs){
+            
             
         }
 };
@@ -742,7 +768,7 @@ class Esfera {  //TODO Testar
         }
 
         vector<Ponto> intRaio(Reta raio){
-            Vetor* vetorAux = vetorDistancia(*raio.getPonto(), this->getCentro());
+            Vetor* vetorAux = vetorDistancia(this->getCentro(),*raio.getPonto());
             double a = raio.getVetor()->produtoEscalar(*raio.getVetor());
             double b = vetorAux->produtoEscalar(*raio.getVetor());
             double c = vetorAux->produtoEscalar(*vetorAux) - this->getRaio()*this->getRaio();
@@ -898,7 +924,7 @@ class Cone : public Objeto {
             Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
         
             //Cálculo dos coeficientes da equaçao do segundo grau
-            double a = (*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal);
+            double a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal)) - ((*reta.getVetor() * *reta.getVetor())* pow(getCossenoGeratriz, 2));
             double b = (v * *reta.getVetor()) * pow(this->getCossenoGeratriz(),2) - 
                     (v * this->normal) * (*reta.getVetor() * this->normal);
             double c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
