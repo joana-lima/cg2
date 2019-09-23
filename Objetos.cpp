@@ -54,7 +54,7 @@ class Matriz {
             };
         }
 
-        Matriz* produto(Matriz B){
+        Matriz* produto(Matriz* B){
             Matriz* A = this;
 
             if(A->colunas != B->linhas){
