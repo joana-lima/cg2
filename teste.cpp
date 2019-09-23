@@ -29,7 +29,28 @@ int main() {
                 // 22 24
     cout << endl;
 
+    cout << "\n-----------Teste de Equação do 2° grau------------" << endl;
+
+    vector<double> raizes1 = equacaoSegundoGrau(1, 2, 1);
+    cout << "\nRaízes de x² + 2x + 1:" << endl;
+    cout << raizes1.size() << " raízes\n";
+    for(int i = 0; i < raizes1.size(); i++){
+        cout << raizes1[i] << endl;
+    }
+
+    vector<double> raizes2 = equacaoSegundoGrau(2, 2, -1);
+    cout << "\nRaízes de 2x² + 2x - 1:" << endl;
+    cout << raizes2.size() << " raízes\n";
+    for(int i = 0; i < raizes2.size(); i++){
+        cout << raizes2[i] << endl;
+    }
     
+    vector<double> raizes3 = equacaoSegundoGrau(1, 2, 0);
+    cout << "\nRaízes de x² + 2x:" << endl;
+    cout << raizes3.size() << " raízes\n";
+    for(int i = 0; i < raizes3.size(); i++){
+        cout << raizes3[i] << endl;
+    }
 
     double resultado;                    //Escalar qualquer
     Ponto *ponto1 = new Ponto(1,1,1);

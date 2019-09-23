@@ -281,18 +281,19 @@ Vetor* vetorDistancia(Ponto p1, Ponto p2) {     //(p2 - p1) Vetor que vai de p1 
 }
 
 vector<double> equacaoSegundoGrau(double a, double b, double c) {
-    double delta = b*b - 4*a*c;
+    double delta = (b*b) - (4*a*c);
     double x1, x2;
     vector<double> escalares;
+
     if(delta < 0)
         return escalares;
     else {
-        x1 = (-b + sqrt(delta))/2*a;
+        x1 = (-b + sqrt(delta))/(2*a);
         escalares.push_back(x1);
         if(delta == 0)
             return escalares;
         else {
-            x2 = (-b - sqrt(delta))/2*a;
+            x2 = (-b - sqrt(delta))/(2*a);
             escalares.push_back(x2);
             return escalares;
         }
