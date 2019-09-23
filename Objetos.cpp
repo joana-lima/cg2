@@ -1010,15 +1010,19 @@ class Mundo{
 
 class Pixel{
     private:   
-        vector<pair <int, Objeto> > solutions;
-        Reta* reta;
-        Mundo* obsMundo;
+    vector<pair <int, Objeto> > solutions;
+    Reta* reta;
+    Mundo* obsMundo;
+    Ponto obs;
+    Ponto center;
 
     public:
-        Pixel(Ponto center, Mundo* obsMundo){
+        Pixel(Ponto center, Ponto obs, Mundo* obsMundo){
             this->obsMundo = obsMundo;
-            this->reta = new Reta( *new Ponto(0,0,0), *vetorDistancia(*new Ponto(0,0,0), center));
-            vector<Objeto> objetos = obsMundo->getObjetos();
+            this->center = center;
+            this->reta = new Reta( obs, *vetorDistancia(obs, center));
+            this->obs = obs;
+            vector<Objeto> objetos = (*obsMundo).getObjetos();
             for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
                 Objeto ob = ((Objeto)(*i));
                 if(ob.getVisibilidade() == true){
@@ -1027,7 +1031,7 @@ class Pixel{
                     vector<double> t_intersec;
 
                     for (auto it_pontos = pontos_intersec.cbegin(); it_pontos != pontos_intersec.cend(); ++it_pontos)
-                        t_intersec.push_back( (vetorDistancia( (*new Ponto(0,0,0)), (Ponto)(*it_pontos) ) )->calcularNorma() );
+                        t_intersec.push_back( (vetorDistancia( obs, (Ponto)(*it_pontos) ) )->calcularNorma() );
 
                     for (auto t = t_intersec.cbegin(); t != t_intersec.cend(); ++t)
                         if((*t)>0) solutions.push_back( make_pair((*t),ob) ); 
@@ -1039,7 +1043,12 @@ class Pixel{
             });
         }
 
-        Vetor getSolution(){
+
+        vector<pair <int, Objeto> > getSolutions(){
+            return solutions;
+        }
+
+        Vetor getColor(){
             Vetor *Id = new Vetor(0,0,0);
             Vetor *Is = new Vetor(0,0,0);
             Vetor Ia = (*obsMundo).getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
@@ -1047,17 +1056,25 @@ class Pixel{
             vector<Luz> luzes = (*obsMundo).getLuzes();
             for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
                 Luz luz= (Luz)(*it_luzes);
-                
-                Vetor normal = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first));
-                Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao())).normalizar();
-                double fd = normal * l;
+
+                if((*new Pixel(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao(), obsMundo)).getSolutions()[0].second.getId()==solutions[0].second.getId()){
+
+                    Vetor normal = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first));
+                    Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao())).normalizar();
+                    double fd = normal * l;
+                    if(fd < 0) fd = 0;
 
 
-                Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2);
-                double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), *new Ponto(0,0,0))).normalizar() * r;
+                    Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2);
+                    double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), obs)).normalizar() * r;
+                    if(fs < 0) fs = 0;
 
-                *Id = *Id + *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fd);
-                *Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
+
+                    *Id = *Id + *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fd);
+                    *Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
+                    
+                }
+
             }
              
             return Ia+*Id+*Is;
@@ -1093,7 +1110,7 @@ class Painel{
 
             for (int i = 0; i < pixels; i++){
                 for (int j = 0; j < pixels; j++){
-                    mtrx[i][j] = (*new Pixel(*getCenter(i,j), obsMundo)).getSolution(); 
+                    mtrx[i][j] = (*new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo)).getColor(); 
                 }
             }
 
@@ -1109,7 +1126,6 @@ class Painel{
 
 
 };
-
 
 
 
