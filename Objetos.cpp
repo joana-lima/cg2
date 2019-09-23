@@ -379,6 +379,10 @@ class Objeto {
             this->id++;
         }
 
+        int getId(){
+        	return id;
+    	}
+
         void setMaterial(Vetor material){
             this->material = material;
         }
@@ -1010,11 +1014,11 @@ class Mundo{
 
 class Pixel{
     private:   
-    vector<pair <int, Objeto> > solutions;
-    Reta* reta;
-    Mundo* obsMundo;
-    Ponto obs;
-    Ponto center;
+	    vector<pair <int, Objeto> > solutions;
+	    Reta* reta;
+	    Mundo* obsMundo;
+	    Ponto obs;
+	    Ponto center;
 
     public:
         Pixel(Ponto center, Ponto obs, Mundo* obsMundo){
