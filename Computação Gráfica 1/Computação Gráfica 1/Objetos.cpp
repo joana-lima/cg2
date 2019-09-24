@@ -45,6 +45,10 @@ class Matriz {
             this->matriz[linha, coluna] = {valor};
         }
 
+        double get(int i, int j){
+            return matriz[i][j];
+        }
+
         void print(){
             for(int i = 0; i < this->matriz.size(); i++){
                 for(int j = 0; j < this->matriz[0].size(); j++){
@@ -210,7 +214,7 @@ class Vetor: public Ponto {
         }
         
         void print() {
-            cout << "Vetor X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "\n" << endl;
+            cout << "Vetor [X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "]";// << "\n" << endl;
         }
 
         Vetor operator + (Vetor const &obj) { 
@@ -300,31 +304,6 @@ vector<double> equacaoSegundoGrau(double a, double b, double c) {
     }
 }
 
-
-// Ponto* convertePontoCamera(Observador obs, Ponto ponto) {
-
-//     Ponto novoPonto1 = ponto * obs.getI();
-//     Ponto novoPonto2 = ponto * obs.getJ();
-//     Ponto novoPonto3 = ponto * obs.getK();
-    
-
-//     vector<vector<double>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
-
-//     vector<double> primeiraLinha = {obs.getI.getX(), obs.getI.getY(), obs.getI.getZ(), novoPonto1};
-//     vector<double> segundalinha = {obs.getJ.getX(), obs.getJ.getY(), obs.getJ.getZ(), novoPonto2};
-//     vector<double> terceiraLinha = {obs.getK.getX(), obs.getK.getY(), obs.getK.getZ(),novoPonto3};
-//     vector<double> quartalinha = {0,0,0,1};
-
-//     vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
-
-//     Matriz *matriz1 = new Matriz(pontoATranformar);
-//     Matriz *matriz2 = new Matriz(matrizDeTransformacao);
-
-//     Matriz *produto = matriz1->produto(matriz2);
-
-//     return produto;
-// }
-
 class Reta {
     protected:
         Ponto ponto;
@@ -361,12 +340,29 @@ class Observador{
         Ponto posicao;
         Ponto lookat;
         Ponto viewup;
+        Matriz *matriz;
 
     public:
         Observador(Ponto posicao, Ponto lookat, Ponto viewup){
             this->posicao = posicao;
             this->lookat = lookat;
             this->viewup = viewup;
+
+            Vetor i = this->getI();
+            Vetor j = this->getJ();
+            Vetor k = this->getK();
+
+            double a = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * i);
+            double b = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * j);
+            double c = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * k);
+
+            vector<double> primeiraLinha = {i.getX(), i.getY(), i.getZ(), a};
+            vector<double> segundalinha  = {j.getX(), j.getY(), j.getZ(), b};
+            vector<double> terceiraLinha = {k.getX(), k.getY(), k.getZ(), c};
+            vector<double> quartalinha = {0,0,0,1};
+
+            vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
+            this->matriz = new Matriz(matrizDeTransformacao);
         }
 
         Ponto* getPosicao(){
@@ -383,6 +379,13 @@ class Observador{
 
         Vetor getK(){
             return *(*vetorDistancia(lookat, posicao)).normalizar();
+        }
+
+
+        Ponto converte(Ponto ponto){
+            vector<vector<double>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
+            Matriz* resultado = matriz->produto(new Matriz(pontoAtransformar));
+            return *new Ponto(resultado->get(0,0), resultado->get(1,0), resultado->get(2,0));
         }
 };
 
@@ -534,16 +537,22 @@ class Plano : public Objeto{
         }
 
         Objeto* transforma(Observador obs){
-            
-            
+            return new Plano(obs.converte(ponto), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)));
         }
 };
 
 class Triangulo : public Objeto {
     public:
+        Ponto ponto1;
+        Ponto ponto2;
+        Ponto ponto3;
+    public:
         Triangulo() : Objeto() {}
         
         Triangulo(Ponto ponto1, Ponto ponto2, Ponto ponto3) {
+            this->ponto1 = ponto1;
+            this->ponto2 = ponto2;
+            this->ponto3 = ponto3;
             this->adicionarVertice(ponto1);
             this->adicionarVertice(ponto2);
             this->adicionarVertice(ponto3);
@@ -596,7 +605,7 @@ class Triangulo : public Objeto {
         }
 
         Objeto* transforma(Observador obs){
-            
+            return new Triangulo(obs.converte(ponto1),obs.converte(ponto2),obs.converte(ponto3));
         }
 
     
@@ -727,7 +736,7 @@ class Cubo : public Objeto {
         }
         
         Objeto* transforma(Observador obs){
-            
+            return new Cubo(obs.converte(centro), largura, *vetorDistancia(*new Ponto(0,0,0) , obs.converte(direcao)));
         }
 
         Vetor* getNormal(Ponto p){
@@ -736,7 +745,7 @@ class Cubo : public Objeto {
 
 };
 
-class Esfera {  //TODO Testar
+class Esfera:public Objeto {  //TODO Testar
     protected:
         Ponto centro;
         double raio;
@@ -784,6 +793,10 @@ class Esfera {  //TODO Testar
         Vetor* getNormal(Ponto p){
             Vetor* normal = vetorDistancia(p, this->centro)->normalizar();
             return normal;
+        }
+
+        Objeto* transforma(Observador obs){
+            return new Esfera(obs.converte(centro), raio);
         }
 };
 
@@ -864,7 +877,8 @@ class Cilindro : public Objeto{
 
 
         Objeto* transforma(Observador obs){
-            
+            return new Cilindro(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
+                                raio, altura);
         }
 
         Vetor* getNormal(Ponto p){
@@ -924,7 +938,7 @@ class Cone : public Objeto {
             Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
         
             //Cálculo dos coeficientes da equaçao do segundo grau
-            double a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal));// - ((*reta.getVetor() * *reta.getVetor())* (getCossenoGeratriz ^^2));
+            double a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal)) - ((*reta.getVetor() * *reta.getVetor())* pow(this->getCossenoGeratriz(), 2));
             double b = (v * *reta.getVetor()) * pow(this->getCossenoGeratriz(),2) - 
                     (v * this->normal) * (*reta.getVetor() * this->normal);
             double c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
@@ -948,7 +962,8 @@ class Cone : public Objeto {
 
 
         Objeto* transforma(Observador obs){
-            
+            return new Cone(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
+                                raio, altura);
         }
 
         Vetor* getNormal(Ponto p){
@@ -976,16 +991,16 @@ class Luz{
             this->intensidade = intensidade;
         }
 
-        Ponto getPosicao(){
-            return this->posicao;
+        Ponto* getPosicao(){
+            return &posicao;
         }
 
         Vetor getIntensidade(){
-            return this->intensidade;
+            return intensidade;
         }
 
         Luz* transforma(Observador obs){
-
+            return new Luz(obs.converte(posicao), intensidade);
         }
 
 };
@@ -1039,6 +1054,10 @@ class Mundo{
 
 };
 
+bool compare(pair<int, Objeto> a,  pair<int, Objeto> b){
+    return a.first < b.first;
+}
+
 class Pixel{
     private:   
 	    vector<pair <int, Objeto> > solutions;
@@ -1049,11 +1068,13 @@ class Pixel{
 
     public:
         Pixel(Ponto center, Ponto obs, Mundo* obsMundo){
+
             this->obsMundo = obsMundo;
             this->center = center;
             this->reta = new Reta( obs, *vetorDistancia(obs, center));
             this->obs = obs;
             vector<Objeto> objetos = (*obsMundo).getObjetos();
+            
             for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
                 Objeto ob = ((Objeto)(*i));
                 if(ob.getVisibilidade() == true){
@@ -1069,9 +1090,7 @@ class Pixel{
                 }
             }
 
-            sort(solutions.begin(), solutions.end(), [](pair<int,Objeto> a, pair<int,Objeto> b){
-                return a.first < b.first;
-            });
+            sort(solutions.begin(), solutions.end(), compare);
         }
 
 
@@ -1088,10 +1107,11 @@ class Pixel{
             for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
                 Luz luz= (Luz)(*it_luzes);
 
-                if((*new Pixel(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao(), obsMundo)).getSolutions()[0].second.getId()==solutions[0].second.getId()){
+                Pixel *test = new Pixel(*(*reta).pontoAtingido(solutions[0].first), *luz.getPosicao(), obsMundo);
+                if((*test).getSolutions()[0].second.getId()==solutions[0].second.getId()){
 
                     Vetor normal = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first));
-                    Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), luz.getPosicao())).normalizar();
+                    Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), *luz.getPosicao())).normalizar();
                     double fd = normal * l;
                     if(fd < 0) fd = 0;
 
@@ -1105,11 +1125,13 @@ class Pixel{
                     *Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
                     
                 }
-
             }
-             
+            
+        
             return Ia+*Id+*Is;
         }
+
+
 
 
 };
@@ -1121,7 +1143,7 @@ class Painel{
         double lado;
         int pixels;
         Mundo* obsMundo;
-        Vetor** mtrx;
+        vector<vector<Vetor>> mtrx;
 
     public:
         Painel(Mundo* obsMundo, double distancia, double lado, int pixels){
@@ -1130,19 +1152,26 @@ class Painel{
             this->lado = lado;
             this->pixels = pixels;
 
+            vector<Vetor> linhas;
+            for(int i = 0; i < pixels; i++){
+                for(int j = 0; j < pixels; j++){
+                    linhas.push_back(*new Vetor(255,255,255));
+                };
 
-            mtrx = (Vetor**) malloc(sizeof(Vetor*) * pixels);
-            for (int i = 0; i < pixels; ++i){
-                mtrx[i] = (Vetor*) malloc(sizeof(Vetor*) * pixels);
-                for (int j = 0; j < pixels; ++j)
-                    mtrx[i][j] = *new Vetor(255,255,255); // cor default;!!                
-            }
+                mtrx.push_back(linhas);
+                linhas.clear();
+            };
 
 
             for (int i = 0; i < pixels; i++){
                 for (int j = 0; j < pixels; j++){
-                    mtrx[i][j] = (*new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo)).getColor(); 
+                    Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
+                    free(pixel);
+                    //mtrx[i,j] = {pixel->getColor()};
+                    mtrx[i][j].print();
+                    //pixel->getSolutions()[0].second.adicionarVertice(*getCenter(i,j));
                 }
+                cout << endl;
             }
 
         }
@@ -1162,6 +1191,8 @@ class Painel{
 
 
 
+
+
 //pixel buffer
 RenderAPI::VertexBuffer vbo;
 
@@ -1169,15 +1200,15 @@ const int width = 512, height = 512;
 
 
 // display function called by MainLoop(), gets executed every frame 
-void disp(void){
+void disp(void) {
 	//Remove the old frame from the buffer
 	RenderAPI::BufferClear();
 
 	//Render using RayCast	
 	RenderAPI::BufferBind(vbo);
 	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
-	Color* colorBuffer;//TODO: your render function here
-	RenderAPI::MapBuffer(colorBuffer, width, height);
+	Color colorBuffer = Color(0, 0, 0);	//TODO: your render function here
+	RenderAPI::MapBuffer(&colorBuffer, width, height);
 
 	//End frame
 	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
@@ -1202,8 +1233,8 @@ void mouse(int button, int state, int x, int y)
 
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-		case(' ')://TODO: your key name here
-			//TODO: your key function here
+	case(' ')://TODO: your key name here
+		//TODO: your key function here
 		break;
 	}
 }
@@ -1214,13 +1245,13 @@ void resize(int w, int h) {
 
 // Main.
 int main(int argc, char** argv) {
-    // Create API window
+	// Create API window
 	RenderAPI::StartRenderAPI(argc, argv, width, height);
-    
+
 	// functions for user interaction
-    RenderAPI::MouseFunc(mouse);
-    RenderAPI::MotionFunc(motion);
-    RenderAPI::KeyboardFunc(keyboard);
+	RenderAPI::MouseFunc(mouse);
+	RenderAPI::MotionFunc(motion);
+	RenderAPI::KeyboardFunc(keyboard);
 	RenderAPI::ReshapeFunc(resize);
 
 	//function that will be called to control what will be displayed
@@ -1228,11 +1259,11 @@ int main(int argc, char** argv) {
 
 	//create the pixel buffer
 	RenderAPI::CreateVBO(&vbo, width, height);
-	
-	//start render loop
-    RenderAPI::RenderLoop();
 
-    //if i'm here is because the render loop was stopped and i'm exiting the application
-	//delete the pixel buffer
+	//start render loop
+	RenderAPI::RenderLoop();
+
+	//if i'm here is because the render loop was stopped and i'm exiting the application
+   //delete the pixel buffer
 	RenderAPI::DeleteVBO(&vbo);
 }

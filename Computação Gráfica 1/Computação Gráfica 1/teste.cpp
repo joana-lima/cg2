@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-
+/*
     cout << "\n-----------Teste de Matriz------------" << endl;
     vector<vector<double>> a = {{2, 3},
                                 {1, 0},
@@ -223,6 +223,23 @@ int main() {
     cout << "\ninicio de teste que deve acertar:\n";
     for(int i = 0; i < intCuboHit.size(); i++){
         intCuboHit[i].print();
-    }
+    }*/
+
+
+
+    
+    Mundo *mundo = new Mundo(*new Vetor(1,1,1));
+    Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
+    cilindro->setMaterial(*new Vetor(2,2,2));
+    mundo->addObjeto(*cilindro);
+
+    Observador* observador = new Observador(*new Ponto(0,0,0), *new Ponto(7,2,0), *new Ponto(0,1,0));
+    Mundo *obsMundo = mundo->obsMundo(*observador);  
+    
+    Painel *painel = new Painel(obsMundo, 2, 10, 25);
+
+
+
+
 
 }
