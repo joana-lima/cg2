@@ -1,5 +1,11 @@
 .vscode
 .vs
 *.exe
+*.obj
 *.out
+*.o
 *.bin
+Computação Gráfica 1/Debug/
+Computação Gráfica 1/x64/
+Computação Gráfica 1/Computação Gráfica 1/Debug/
+Computação Gráfica 1/Computação Gráfica 1/x64
