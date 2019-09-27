@@ -397,7 +397,7 @@ class Objeto {
         vector<vector<Ponto>> arestas;
         vector<vector<Ponto>> faces;
         bool visibilidade;
-        Vetor material;
+        Vetor* material;
 
     public:
         Objeto() {
@@ -412,11 +412,11 @@ class Objeto {
         	return id;
     	}
 
-        void setMaterial(Vetor material){
+        void setMaterial(Vetor* material){
             this->material = material;
         }
 
-        void print(){
+        virtual void print(){
             cout << "Objeto - ID: " << id <<endl;
             cout << "Visibilidade: ";
             visibilidade ? cout << "true\n" : cout<<"false\n";
@@ -484,7 +484,7 @@ class Objeto {
             return this->faces;
         }
 
-        Vetor getMaterial(){
+        Vetor* getMaterial(){
             return this->material;
         }
 
@@ -831,6 +831,10 @@ class Cilindro : public Objeto{
             return this->altura;
         }
 
+        void print(){
+            cout << " Cilindro" << endl;
+        }
+
         vector<Ponto> intRaio(Reta reta) {
             vector<Ponto> pontosAtingidos;
 
@@ -1007,8 +1011,8 @@ class Luz{
 
 class Mundo{
     private:
-        vector<Objeto> objetos;
-        vector<Luz> luzes;
+        vector<Objeto*> objetos;
+        vector<Luz*> luzes;
         Vetor luz_ambiente;
 
     public:
@@ -1016,19 +1020,19 @@ class Mundo{
             this->luz_ambiente = luz_ambiente;
         }
 
-        void addObjeto(Objeto obj){
+        void addObjeto(Objeto* obj){
             objetos.push_back(obj);
         }
 
-        void addLuz(Luz luz){
+        void addLuz(Luz* luz){
             luzes.push_back(luz);
         }
 
-        vector<Objeto> getObjetos(){
+        vector<Objeto*> getObjetos(){
             return objetos;
         }
 
-        vector<Luz> getLuzes(){
+        vector<Luz*> getLuzes(){
             return luzes;
         }
 
@@ -1040,12 +1044,13 @@ class Mundo{
             Mundo *obsMundo = new Mundo(luz_ambiente);
 
             for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
-                Objeto ob = *((Objeto)(*i)).transforma(obs);
+                Objeto* ob = (*i)->transforma(obs);
+                ob->setMaterial((*i)->getMaterial());
                 obsMundo->addObjeto(ob);
             } 
 
             for (auto i = luzes.cbegin(); i != luzes.cend(); ++i){
-                Luz ob = *((Luz)(*i)).transforma(obs);
+                Luz* ob = (*i)->transforma(obs);
                 obsMundo->addLuz(ob);
             }
 
@@ -1054,13 +1059,13 @@ class Mundo{
 
 };
 
-bool compare(pair<int, Objeto> a,  pair<int, Objeto> b){
+bool compare(pair<double, Objeto*> a,  pair<double, Objeto*> b){
     return a.first < b.first;
 }
 
 class Pixel{
     private:   
-	    vector<pair <int, Objeto> > solutions;
+	    vector<pair <double, Objeto*> > solutions;
 	    Reta* reta;
 	    Mundo* obsMundo;
 	    Ponto obs;
@@ -1073,62 +1078,68 @@ class Pixel{
             this->center = center;
             this->reta = new Reta( obs, *vetorDistancia(obs, center));
             this->obs = obs;
-            vector<Objeto> objetos = (*obsMundo).getObjetos();
+            vector<Objeto*> objetos = (*obsMundo).getObjetos();
             
-            for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
-                Objeto ob = ((Objeto)(*i));
-                if(ob.getVisibilidade() == true){
+            for(vector<Objeto*>::iterator i=objetos.begin(); i != objetos.end(); i++){ 
+                if((*i)->getVisibilidade() == true){
 
-                    vector<Ponto> pontos_intersec = ob.intRaio( *reta );
+                    vector<Ponto> pontos_intersec = (*i)->intRaio( *reta );
                     vector<double> t_intersec;
 
-                    for (auto it_pontos = pontos_intersec.cbegin(); it_pontos != pontos_intersec.cend(); ++it_pontos)
+
+                    for (vector<Ponto>::iterator it_pontos = pontos_intersec.begin(); it_pontos != pontos_intersec.end(); it_pontos++)
                         t_intersec.push_back( (vetorDistancia( obs, (Ponto)(*it_pontos) ) )->calcularNorma() );
 
-                    for (auto t = t_intersec.cbegin(); t != t_intersec.cend(); ++t)
-                        if((*t)>0) solutions.push_back( make_pair((*t),ob) ); 
-                }
+                        
+
+                    for (vector<double>::iterator t = t_intersec.begin(); t != t_intersec.end(); t++)
+                        if((*t)>0) solutions.push_back( make_pair((*t),(*i)) ); 
+                                   
+                    }
+
             }
 
             sort(solutions.begin(), solutions.end(), compare);
         }
 
 
-        vector<pair <int, Objeto> > getSolutions(){
+        vector<pair <double, Objeto*> > getSolutions(){
             return solutions;
         }
 
         Vetor getColor(){
-            Vetor *Id = new Vetor(0,0,0);
-            Vetor *Is = new Vetor(0,0,0);
-            Vetor Ia = (*obsMundo).getLuzAmbiente().elemMult(solutions[0].second.getMaterial());
-            
-            vector<Luz> luzes = (*obsMundo).getLuzes();
-            for (auto it_luzes = luzes.cbegin(); it_luzes != luzes.cend(); ++it_luzes){
-                Luz luz= (Luz)(*it_luzes);
+            if(solutions.size() != 0) {
+                Vetor *Id = new Vetor(0,0,0);
+                Vetor *Is = new Vetor(0,0,0);
 
-                Pixel *test = new Pixel(*(*reta).pontoAtingido(solutions[0].first), *luz.getPosicao(), obsMundo);
-                if((*test).getSolutions()[0].second.getId()==solutions[0].second.getId()){
+                Vetor Ia = (*obsMundo).getLuzAmbiente().elemMult( *solutions.front().second->getMaterial() );
+                
+                vector<Luz*> luzes = (*obsMundo).getLuzes();
+                for(vector<Luz*>::iterator it_luzes=luzes.begin(); it_luzes != luzes.end(); it_luzes++){ 
 
-                    Vetor normal = *solutions[0].second.getNormal(*(*reta).pontoAtingido(solutions[0].first));
-                    Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), *luz.getPosicao())).normalizar();
-                    double fd = normal * l;
-                    if(fd < 0) fd = 0;
+                    Pixel *test = new Pixel(*(*reta).pontoAtingido(solutions.front().first), *((*it_luzes)->getPosicao()), obsMundo);
+                    if((*test).getSolutions().front().second->getId()==solutions.front().second->getId()){
 
-
-                    Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2);
-                    double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions[0].first), obs)).normalizar() * r;
-                    if(fs < 0) fs = 0;
+                        Vetor normal = *solutions.front().second->getNormal(*(*reta).pontoAtingido(solutions.front().first));
+                        Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), *(*it_luzes)->getPosicao())).normalizar();
+                        double fd = normal * l;
+                        if(fd < 0) fd = 0;
 
 
-                    *Id = *Id + *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fd);
-                    *Is = *Is +  *luz.getIntensidade().elemMult(solutions[0].second.getMaterial()).multEscalar(fs);  
-                    
+                        Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2);
+                        double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), obs)).normalizar() * r;
+                        if(fs < 0) fs = 0;
+
+
+                        *Id = *Id + *((*it_luzes)->getIntensidade().elemMult(*solutions.front().second->getMaterial()).multEscalar(fd));
+                        *Is = *Is +  *((*it_luzes)->getIntensidade().elemMult(*solutions.front().second->getMaterial()).multEscalar(fs));  
+                        
+                    }
                 }
-            }
             
-        
-            return Ia+*Id+*Is;
+                return Ia+*Id+*Is;
+            }
+            return Vetor(0,0,0);
         }
 
 
@@ -1155,25 +1166,18 @@ class Painel{
             vector<Vetor> linhas;
             for(int i = 0; i < pixels; i++){
                 for(int j = 0; j < pixels; j++){
-                    linhas.push_back(*new Vetor(255,255,255));
-                };
+                    Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
+                    linhas.push_back(pixel->getColor());
+                }
 
                 mtrx.push_back(linhas);
                 linhas.clear();
-            };
-
-
-            for (int i = 0; i < pixels; i++){
-                for (int j = 0; j < pixels; j++){
-                    Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
-                    free(pixel);
-                    //mtrx[i,j] = {pixel->getColor()};
-                    mtrx[i][j].print();
-                    //pixel->getSolutions()[0].second.adicionarVertice(*getCenter(i,j));
-                }
-                cout << endl;
             }
 
+        }
+
+        vector<vector<Vetor>> getMatrix(){
+            return mtrx;
         }
 
         Ponto* getCenter(int i, int j){
