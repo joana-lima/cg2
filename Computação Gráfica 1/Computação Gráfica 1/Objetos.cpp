@@ -1197,10 +1197,11 @@ RenderAPI::VertexBuffer vbo;
 
 const int width = 512, height = 512;
 
+Painel* painel;
 
 // display function called by MainLoop(), gets executed every frame 
 void disp(void){
-    
+    /*
     Mundo *mundo = new Mundo(*new Vetor(1,1,1));
     Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
     cilindro->setMaterial(new Vetor(1,1,1));
@@ -1210,7 +1211,7 @@ void disp(void){
     Mundo *obsMundo = mundo->obsMundo(*observador);  
     
 
-    Painel *painel = new Painel(obsMundo, 2, 10, 512);
+    Painel *painel = new Painel(obsMundo, 2, 10, 512);*/
     vector<vector<Color>> colorBuffer = painel->getMatrix();
 
 	//Remove the old frame from the buffer
@@ -1259,6 +1260,15 @@ void resize(int w, int h) {
 int main(int argc, char** argv) {
 
     // teste();
+	Mundo* mundo = new Mundo(*new Vetor(1, 1, 1));
+	Objeto* cilindro = new Cilindro(*new Ponto(7, 0, 0), *new Vetor(0, 1, 0), 3.0, 7.0);
+	cilindro->setMaterial(new Vetor(1, 1, 1));
+	mundo->addObjeto(cilindro);
+
+	Observador* observador = new Observador(*new Ponto(0, 0, 0), *new Ponto(7, 2, 0), *new Ponto(0, 1, 0));
+	Mundo* obsMundo = mundo->obsMundo(*observador);
+
+	painel = new Painel(obsMundo, 2, 10, 512);
 
     // Create API window
 	RenderAPI::StartRenderAPI(argc, argv, width, height);
