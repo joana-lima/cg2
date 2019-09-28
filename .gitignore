@@ -1,5 +1,8 @@
 .vscode
 .vs
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 *.exe
 *.obj
 *.out
