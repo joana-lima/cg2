@@ -12,9 +12,9 @@
 
 class Color {
     public:
-    int r;
-    int g;
-    int b;
+    float r;
+    float g;
+    float b;
 
 	Color(int r, int g, int b) {
 		this->r = r;
