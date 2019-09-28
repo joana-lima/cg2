@@ -1,8 +1,57 @@
 #include "Objetos.cpp"
 
+
+
 using namespace std;
 
-int main() {
+class A{
+    protected:
+        int number;
+    public:
+
+
+    virtual vector<Ponto> nuwaa(Reta reta){
+        vector<Ponto> p;
+        p.push_back(*new Ponto(0,0,0));
+        
+
+        return p;}
+    
+    void setNumber(int number){
+        this->number = number;
+    }
+
+    int getNumber(){
+        return number;
+    }
+
+
+};
+
+class B: public A{
+    public:
+    vector<Ponto> nuwaa(Reta reta){
+        vector<Ponto> p;
+        p.push_back(*new Ponto(1,0,0));
+        
+
+        return p;
+    }
+
+};
+
+class C: public A{
+    public:
+    vector<Ponto> nuwaa(Reta reta){
+        vector<Ponto> p;
+        p.push_back(*new Ponto(2,0,0));
+        
+
+        return p;
+    }
+};
+
+int teste() {
 /*
     cout << "\n-----------Teste de Matriz------------" << endl;
     vector<vector<double>> a = {{2, 3},
@@ -227,19 +276,56 @@ int main() {
 
 
 
-    
+
     Mundo *mundo = new Mundo(*new Vetor(1,1,1));
     Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
-    cilindro->setMaterial(*new Vetor(2,2,2));
-    mundo->addObjeto(*cilindro);
+    cilindro->setMaterial(new Vetor(1,1,1));
+    mundo->addObjeto(cilindro);
 
     Observador* observador = new Observador(*new Ponto(0,0,0), *new Ponto(7,2,0), *new Ponto(0,1,0));
     Mundo *obsMundo = mundo->obsMundo(*observador);  
     
+
     Painel *painel = new Painel(obsMundo, 2, 10, 25);
+    vector<vector<Color>> mtrx = painel->getMatrix();
+    int pixels=25; 
+    for (int i = 0; i < pixels; i++){
+        for (int j = 0; j < pixels; j++){
+            cout << mtrx[i][j].r << "," << mtrx[i][j].g << "," << mtrx[i][j].b << " - ";
+        }
+        cout << endl;
+    }
+
+/*
+
+    cout << "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK \n\n";
+    Reta *reta = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
 
 
+    vector<pair<double, A*>> as;
+    A* a = new B();
+    a->setNumber(10);
+    as.push_back(make_pair(1, a));
+    as.push_back(make_pair(2, new B()));
+    as.push_back(make_pair(3, new C()));
+
+    cout << as.front().second->getNumber();
+
+    for(vector<A*>::iterator i=as.begin(); i != as.end(); i++){
 
 
+        for(vector<Ponto>::iterator it=p.begin(); it != p.end(); it++) 
+            (*it).print();
 
+
+    }
+
+
+    A* b = new B();
+
+    b->setNumber(20);
+    cout << b->getNumber();
+*/
+
+    return 0;
 }
