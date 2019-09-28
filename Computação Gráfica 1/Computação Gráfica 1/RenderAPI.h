@@ -16,7 +16,7 @@ class Color {
     float g;
     float b;
 
-	Color(int r, int g, int b) {
+	Color(float r, float g, float b) {
 		this->r = r;
 		this->g = g;
 		this->b = b;
