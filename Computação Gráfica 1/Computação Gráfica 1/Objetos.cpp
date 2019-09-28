@@ -514,6 +514,10 @@ class Plano : public Objeto{
             return &this->normal;
         }
 
+		Vetor* getNormal(Ponto ponto) {
+			return &this->normal;
+		}
+
         bool pertencePlano(Ponto ponto) {
             Vetor* distancia = vetorDistancia(this->ponto, ponto);
             double resultado = *distancia * (this->normal);
@@ -881,9 +885,12 @@ class Cilindro : public Objeto{
 
 
         Objeto* transforma(Observador obs){
-            return new Cilindro(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
-                                raio, altura);
-        }
+            //return new Cilindro(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
+                               //raio, altura);
+			return new Cilindro(obs.converte(base), normal,
+				raio, altura);
+
+		}
 
         Vetor* getNormal(Ponto p){
             Ponto projecaoPIntEixo = *somaPontoVetor(this->base, *(vetorDistancia(p, this->base)->produtoVetorial(this->normal)->produtoVetorial(this->normal)));
@@ -966,8 +973,10 @@ class Cone : public Objeto {
 
 
         Objeto* transforma(Observador obs){
-            return new Cone(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
-                                raio, altura);
+            //return new Cone(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
+                               // raio, altura);
+			return new Cone(obs.converte(base), normal,
+				raio, altura);
         }
 
         Vetor* getNormal(Ponto p){
@@ -1014,6 +1023,7 @@ class Mundo{
         vector<Objeto*> objetos;
         vector<Luz*> luzes;
         Vetor luz_ambiente;
+		Observador* observador;
 
     public:
         Mundo(Vetor luz_ambiente){
@@ -1036,21 +1046,30 @@ class Mundo{
             return luzes;
         }
 
+		void setObservador(Observador *observador) {
+			this->observador = observador;
+		}
+
+		Observador* getObservador() {
+			return observador;
+		}
+
         Vetor getLuzAmbiente(){
             return luz_ambiente;
         }
 
-        Mundo* obsMundo(Observador obs){
+        Mundo* obsMundo(Observador* obs){
             Mundo *obsMundo = new Mundo(luz_ambiente);
+			obsMundo->setObservador(obs);
 
             for (auto i = objetos.cbegin(); i != objetos.cend(); ++i){
-                Objeto* ob = (*i)->transforma(obs);
+                Objeto* ob = (*i)->transforma(*obs);
                 ob->setMaterial((*i)->getMaterial());
                 obsMundo->addObjeto(ob);
             } 
 
             for (auto i = luzes.cbegin(); i != luzes.cend(); ++i){
-                Luz* ob = (*i)->transforma(obs);
+                Luz* ob = (*i)->transforma(*obs);
                 obsMundo->addLuz(ob);
             }
 
@@ -1118,15 +1137,15 @@ class Pixel{
                 for(vector<Luz*>::iterator it_luzes=luzes.begin(); it_luzes != luzes.end(); it_luzes++){ 
 
                     Pixel *test = new Pixel(*(*reta).pontoAtingido(solutions.front().first), *((*it_luzes)->getPosicao()), obsMundo);
-                    if((*test).getSolutions().front().second->getId()==solutions.front().second->getId()){
+                    if((*test).getSolutions().size() != 0 && (*test).getSolutions().front().second->getId()==solutions.front().second->getId()){
 
-                        Vetor normal = *solutions.front().second->getNormal(*(*reta).pontoAtingido(solutions.front().first));
+                        Vetor normal = *solutions.front().second->getNormal(*(*reta).pontoAtingido(solutions.front().first))->normalizar();
                         Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), *(*it_luzes)->getPosicao())).normalizar();
                         double fd = normal * l;
                         if(fd < 0) fd = 0;
 
 
-                        Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2);
+                        Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2)->normalizar();
                         double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), obs)).normalizar() * r;
                         if(fs < 0) fs = 0;
 
@@ -1140,7 +1159,7 @@ class Pixel{
                 Ia = Ia+*Id+*Is;
                 return Color(Ia.getX(), Ia.getY(), Ia.getZ());
             }
-            return Color(0,0,0);
+            return Color(1,1,1);
         }
 };
 
@@ -1163,8 +1182,10 @@ class Painel{
             vector<Color> linhas;
             for(int i = 0; i < pixels; i++){
                 for(int j = 0; j < pixels; j++){
-                    Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
-                    linhas.push_back(pixel->getColor());
+                    Pixel* pixel = new Pixel(*getCenter(i,j), *obsMundo->getObservador()->getPosicao(), obsMundo);
+					//Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
+
+					linhas.push_back(pixel->getColor());
                 }
 
                 mtrx.push_back(linhas);
@@ -1198,22 +1219,15 @@ RenderAPI::VertexBuffer vbo;
 const int width = 512, height = 512;
 
 Painel* painel;
+Mundo* obsMundo;
 
 // display function called by MainLoop(), gets executed every frame 
 void disp(void){
-    /*
-    Mundo *mundo = new Mundo(*new Vetor(1,1,1));
-    Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
-    cilindro->setMaterial(new Vetor(1,1,1));
-    mundo->addObjeto(cilindro);
-
-    Observador* observador = new Observador(*new Ponto(0,0,0), *new Ponto(7,2,0), *new Ponto(0,1,0));
-    Mundo *obsMundo = mundo->obsMundo(*observador);  
     
-
-    Painel *painel = new Painel(obsMundo, 2, 10, 512);*/
+ 
     vector<vector<Color>> colorBuffer = painel->getMatrix();
 
+	
 	//Remove the old frame from the buffer
 	RenderAPI::BufferClear();
 
@@ -1236,12 +1250,14 @@ int theModifierState = 0;
 // camera mouse controls in X and Y direction
 void motion(int x, int y)
 {
-	//TODO: your mouse moviment functions here
 }
 
 void mouse(int button, int state, int x, int y)
 {
-	//TODO: your mouse functions here 
+	cout << x << " " << y << endl;
+	Pixel* p = new Pixel(*painel->getCenter(x, y), *obsMundo->getObservador()->getPosicao(), obsMundo);
+	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
+	else cout << "None" << endl;
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -1260,14 +1276,36 @@ void resize(int w, int h) {
 int main(int argc, char** argv) {
 
     // teste();
-	Mundo* mundo = new Mundo(*new Vetor(1, 1, 1));
-	Objeto* cilindro = new Cilindro(*new Ponto(7, 0, 0), *new Vetor(0, 1, 0), 3.0, 7.0);
-	cilindro->setMaterial(new Vetor(1, 1, 1));
+	Mundo* mundo = new Mundo(*new Vetor(0.1, 0.1, 0.1));
+	Objeto* cilindro = new Cilindro(*new Ponto(7, 5, 0), *new Vetor(0, -1, 0), 1.0, 5.0);
+	cilindro->setMaterial(new Vetor(0.58, 0.29, 0));
 	mundo->addObjeto(cilindro);
 
-	Observador* observador = new Observador(*new Ponto(0, 0, 0), *new Ponto(7, 2, 0), *new Ponto(0, 1, 0));
-	Mundo* obsMundo = mundo->obsMundo(*observador);
+	Objeto* cone = new Cone(*new Ponto(7, 0, 0), *new Vetor(0, -1, 0), 3.0, 5.0);
+	cone->setMaterial(new Vetor(0, 0.8, 0));
+	mundo->addObjeto(cone);
 
+	/*
+	Objeto* esfera1 = new Esfera(*new Ponto(7, 5, 2), 1);
+	esfera1->setMaterial(new Vetor(0, 0.8, 0));
+	mundo->addObjeto(esfera1);
+	*/
+
+	/*
+	Objeto* esfera2 = new Esfera(*new Ponto(7, 5, -2), 1);
+	esfera2->setMaterial(new Vetor(0, 0.8, 0));
+	mundo->addObjeto(esfera2);
+	*/
+	/*
+	Objeto* plano = new Plano(*new Ponto(0, 0, 0), *new Vetor(0, 1, 0));
+	plano->setMaterial(new Vetor(0, 0, 0));
+	mundo->addObjeto(plano);
+	*/
+
+	mundo->addLuz(new Luz(*new Ponto(7, 7, 0), *new Vetor(0.3, 0.3, 0.3)));
+
+	Observador* observador = new Observador(*new Ponto(0, -1, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
+	obsMundo = mundo->obsMundo(observador);
 	painel = new Painel(obsMundo, 2, 10, 512);
 
     // Create API window
