@@ -488,9 +488,9 @@ class Objeto {
             return this->material;
         }
 
-        virtual Objeto* transforma(Observador obs){}
-        virtual Vetor* getNormal(Ponto p){}
-        virtual vector<Ponto> intRaio(Reta reta){}
+		virtual Objeto* transforma(Observador obs) { return 0; }
+		virtual Vetor* getNormal(Ponto p) { return 0; }
+		virtual vector<Ponto> intRaio(Reta reta) { return {}; }
 
 };
 
@@ -615,7 +615,7 @@ class Cubo : public Objeto {
     protected:
         Ponto centro;
         Vetor direcao;
-        double largura;
+        float largura;
 
         Triangulo* triangulo1;
         Triangulo* triangulo2;
@@ -1193,76 +1193,92 @@ class Painel{
 
 
 //pixel buffer
-//RenderAPI::VertexBuffer vbo;
+RenderAPI::VertexBuffer vbo;
 
-// const int width = 512, height = 512;
+const int width = 512, height = 512;
 
 
-// // display function called by MainLoop(), gets executed every frame 
-// void disp(void){
-// 	//Remove the old frame from the buffer
-// 	RenderAPI::BufferClear();
-
-// 	//Render using RayCast	
-// 	RenderAPI::BufferBind(vbo);
-// 	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
-// 	Color* colorBuffer;//TODO: your render function here
-// 	RenderAPI::MapBuffer(colorBuffer, width, height);
-
-// 	//End frame
-// 	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
-// 	RenderAPI::ReDisplay();//recall the display function
-// }
-
-// // mouse event handlers
-// int lastX = 0, lastY = 0;
-// int theButtonState = 0;
-// int theModifierState = 0;
-
-// // camera mouse controls in X and Y direction
-// void motion(int x, int y)
-// {
-// 	//TODO: your mouse moviment functions here
-// }
-
-// void mouse(int button, int state, int x, int y)
-// {
-// 	//TODO: your mouse functions here 
-// }
-
-// void keyboard(unsigned char key, int x, int y) {
-// 	switch (key) {
-// 		case(' ')://TODO: your key name here
-// 			//TODO: your key function here
-// 		break;
-// 	}
-// }
-
-// void resize(int w, int h) {
-// 	RenderAPI::setView(w, h);
-// }
-
-// // Main.
-// int main(int argc, char** argv) {
-//     // Create API window
-// 	RenderAPI::StartRenderAPI(argc, argv, width, height);
+// display function called by MainLoop(), gets executed every frame 
+void disp(void){
     
-// 	// functions for user interaction
-//     RenderAPI::MouseFunc(mouse);
-//     RenderAPI::MotionFunc(motion);
-//     RenderAPI::KeyboardFunc(keyboard);
-// 	RenderAPI::ReshapeFunc(resize);
+    Mundo *mundo = new Mundo(*new Vetor(1,1,1));
+    Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
+    cilindro->setMaterial(new Vetor(1,1,1));
+    mundo->addObjeto(cilindro);
 
-// 	//function that will be called to control what will be displayed
-// 	RenderAPI::DisplayFunc(disp);
+    Observador* observador = new Observador(*new Ponto(0,0,0), *new Ponto(7,2,0), *new Ponto(0,1,0));
+    Mundo *obsMundo = mundo->obsMundo(*observador);  
+    
 
-// 	//create the pixel buffer
-// 	RenderAPI::CreateVBO(&vbo, width, height);
+    Painel *painel = new Painel(obsMundo, 2, 10, 512);
+    vector<vector<Color>> colorBuffer = painel->getMatrix();
+
+	//Remove the old frame from the buffer
+	RenderAPI::BufferClear();
+
+	//Render using RayCast	
+	RenderAPI::BufferBind(vbo);
+	//get the pixel color list, where if you have 100 x 100 pixels this list will have size 10.000 and will be read line by line
+	// vector< vector< Color >> colorBuffer; //TODO: your render function here
+	RenderAPI::MapBuffer(colorBuffer, width, height);
+
+	//End frame
+	RenderAPI::SwapBuffers();//set the actual frame to the graphic card
+	RenderAPI::ReDisplay();//recall the display function
+}
+
+// mouse event handlers
+int lastX = 0, lastY = 0;
+int theButtonState = 0;
+int theModifierState = 0;
+
+// camera mouse controls in X and Y direction
+void motion(int x, int y)
+{
+	//TODO: your mouse moviment functions here
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	//TODO: your mouse functions here 
+}
+
+void keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+		case(' ')://TODO: your key name here
+			//TODO: your key function here
+		break;
+	}
+}
+
+void resize(int w, int h) {
+	RenderAPI::setView(w, h);
+}
+
+// Main.
+int main(int argc, char** argv) {
+
+    // teste();
+
+    // Create API window
+	RenderAPI::StartRenderAPI(argc, argv, width, height);
+    
+	// functions for user interaction
+    RenderAPI::MouseFunc(mouse);
+    RenderAPI::MotionFunc(motion);
+    RenderAPI::KeyboardFunc(keyboard);
+	RenderAPI::ReshapeFunc(resize);
+
+	//function that will be called to control what will be displayed
+	RenderAPI::DisplayFunc(disp);
+
+	//create the pixel buffer
+	RenderAPI::CreateVBO(&vbo, width, height);
 	
-// 	//start render loop
-//     RenderAPI::RenderLoop();
+	//start render loop
+    RenderAPI::RenderLoop();
 
-//     //if i'm here is because the render loop was stopped and i'm exiting the application
-// 	//delete the pixel buffer
-// 	RenderAPI::DeleteVBO(&vbo);
-// }
+    //if i'm here is because the render loop was stopped and i'm exiting the application
+	//delete the pixel buffer
+	RenderAPI::DeleteVBO(&vbo);
+}

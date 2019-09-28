@@ -110,22 +110,22 @@ namespace RenderAPI{
 
 	//TODO: Use your color struct here
 	//Map the buffer data to the graphics card 
-	inline void MapBuffer(Color *color_buffer, int width, int height){
+	inline void MapBuffer(std::vector< std::vector< Color >> color_buffer, int width, int height){
 		//get the graphics card actual buffer
 		float *buffer = (float*) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 		if (!buffer)return;
-		Color *c_buff = color_buffer;
+		std::vector <std::vector< Color >> c_buff = color_buffer;
 		
 		
 		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++, c_buff++) {
+			for (int x = 0; x < width; x++) {
 				//set the pix position 
 				buffer[(y*width + x) * 5 + 0] = (float) x;
 				buffer[(y*width + x) * 5 + 1] = (float) y;
 				//set the pix rgb values
-				buffer[(y*width + x) * 5 + 2] = c_buff->r;
-				buffer[(y*width + x) * 5 + 3] = c_buff->g;
-				buffer[(y*width + x) * 5 + 4] = c_buff->b;
+				buffer[(y * width + x) * 5 + 2] = c_buff[y%c_buff.size()][x%c_buff[0].size()].r;
+				buffer[(y * width + x) * 5 + 3] = c_buff[y%c_buff.size()][x%c_buff[0].size()].g;
+				buffer[(y * width + x) * 5 + 4] = c_buff[y%c_buff.size()][x%c_buff[0].size()].b;
 			}
 		}
 		//Unmap the buffer, this tell the GC (graphics card) that we have finished our cahnges
