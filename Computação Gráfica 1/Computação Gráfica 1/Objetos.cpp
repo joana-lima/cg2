@@ -849,10 +849,8 @@ class Cilindro : public Objeto{
 
 
         Objeto* transforma(Observador obs){
-            //return new Cilindro(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
-                               //raio, altura);
-			return new Cilindro(obs.converte(base), normal,
-				raio, altura);
+            //return new Cilindro(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),   raio, altura);
+			return new Cilindro(obs.converte(base), normal, raio, altura);
 
 		}
 
@@ -927,7 +925,7 @@ class Cone : public Objeto {
             for(i=escalares.begin(); i != escalares.end(); i++) {
                 //Testando validade dos pontos.
                 p = *reta.pontoAtingido(*i);
-                teste = *vetorDistancia(p, this->vertice) * this->normal;
+                teste = *vetorDistancia(base, p) * this->normal;
                 if(0<=teste && teste<=this->altura) {
                     pontosAtingidos.push_back(p);
                 }
@@ -937,8 +935,7 @@ class Cone : public Objeto {
 
 
         Objeto* transforma(Observador obs){
-            //return new Cone(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),
-                               // raio, altura);
+            //return new Cone(obs.converte(base), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)),   raio, altura);
 			return new Cone(obs.converte(base), normal,
 				raio, altura);
         }
@@ -1109,6 +1106,9 @@ class Pixel{
                         if(fd < 0) fd = 0;
 
 
+						//double m = l.multEscalar(normal * l)->calcularNorma();
+						//Vetor p = *normal.multEscalar(m);
+						//Vetor r = *p.multEscalar(2) - l;
                         Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2)->normalizar();
                         double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), obs)).normalizar() * r;
                         if(fs < 0) fs = 0;
@@ -1144,15 +1144,16 @@ class Painel{
             this->pixels = pixels;
 
             vector<Cor> linhas;
-            for(int i = 0; i < pixels; i++){
+            for(int i = 0; i <= pixels; i++){
                 for(int j = 0; j < pixels; j++){
                     Pixel* pixel = new Pixel(*getCenter(i,j), *obsMundo->getObservador()->getPosicao(), obsMundo);
 					//Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
 
 					linhas.push_back(pixel->getCor());
+					//linhas.insert(linhas.begin(), pixel->getCor());
                 }
-
-                mtrx.push_back(linhas);
+				//mtrx.push_back(linhas);
+                mtrx.insert(mtrx.begin(),linhas);
                 linhas.clear();
             }
 
@@ -1214,18 +1215,20 @@ int theModifierState = 0;
 // camera mouse controls in X and Y direction
 void motion(int x, int y)
 {
+	/*cout << x << " " << y << endl;
+	Pixel* p = new Pixel(*painel->getCenter(x, y), *obsMundo->getObservador()->getPosicao(), obsMundo);
+	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
+	else cout << "None" << endl;*/
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	
 	cout << x << " " << y << endl;
 	Pixel* p = new Pixel(*painel->getCenter(x, y), *obsMundo->getObservador()->getPosicao(), obsMundo);
 	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
 	else cout << "None" << endl;
-}
-
-void mouse(int button, int state, int x, int y)
-{/*
-	cout << x << " " << y << endl;
-	Pixel* p = new Pixel(*painel->getCenter(x, y), *obsMundo->getObservador()->getPosicao(), obsMundo);
-	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
-	else cout << "None" << endl;*/
+	
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -1243,44 +1246,55 @@ void resize(int w, int h) {
 // Main.
 int main(int argc, char** argv) {
 	
+/*
+		Objeto* esfera1 = new Esfera(*new Ponto(7, 5, 2), 1);
+	esfera1->setMaterial(new Vetor(0, 0.8, 0));
+	mundo->addObjeto(esfera1);
+
+
+
+	Objeto* esfera2 = new Esfera(*new Ponto(7, 5, -2), 1);
+	esfera2->setMaterial(new Vetor(0, 0.8, 0));
+	mundo->addObjeto(esfera2);
+
+
+	Objeto* plano = new Plano(*new Ponto(0, 0, 0), *new Vetor(0, 1, 0));
+	plano->setMaterial(new Vetor(0, 0, 0));
+	mundo->addObjeto(plano);
+		
+	}
+	*/
+	
     // teste();
 	Mundo* mundo = new Mundo(*new Vetor(0.1, 0.1, 0.1));
-	Objeto* cilindro = new Cilindro(*new Ponto(7, 5, 0), *new Vetor(0, -1, 0), 1.0, 5.0);
+	Objeto* cilindro = new Cilindro(*new Ponto(7, 0, 0), *new Vetor(0, 1, 0), 1.0, 5.0);
 	cilindro->setMaterial(new Vetor(0.58, 0.29, 0));
 	mundo->addObjeto(cilindro);
 
 	cout << cilindro->getId() << endl;
 
-	Objeto* cone = new Cone(*new Ponto(7, 0, 0), *new Vetor(0, -1, 0), 3.0, 5.0);
+	Objeto* cone = new Cone(*new Ponto(7, 5, 0), *new Vetor(0, 1, 0), 3.0, 5.0);
 	cone->setMaterial(new Vetor(0, 0.8, 0));
 	mundo->addObjeto(cone);
 
 	cout << cone->getId() << endl;
+	mundo->addLuz(new Luz(*new Ponto(7, 7, 5), *new Vetor(0.3, 0.3, 0.3)));
+	Observador* observador = new Observador(*new Ponto(0, 5, 0), *new Ponto(7, 5, 0), *new Ponto(0, 10, 0));
 
-	/*
-	Objeto* esfera1 = new Esfera(*new Ponto(7, 5, 2), 1);
-	esfera1->setMaterial(new Vetor(0, 0.8, 0));
-	mundo->addObjeto(esfera1);
-	
-
-	
-	Objeto* esfera2 = new Esfera(*new Ponto(7, 5, -2), 1);
-	esfera2->setMaterial(new Vetor(0, 0.8, 0));
-	mundo->addObjeto(esfera2);
-	
-	
-	Objeto* plano = new Plano(*new Ponto(0, 0, 0), *new Vetor(0, 1, 0));
-	plano->setMaterial(new Vetor(0, 0, 0));
-	mundo->addObjeto(plano);
-	*/
-
-
-	mundo->addLuz(new Luz(*new Ponto(0, 0, 0), *new Vetor(0.3, 0.3, 0.3)));
-
-	Observador* observador = new Observador(*new Ponto(0, -1, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
 	obsMundo = mundo->obsMundo(observador);
 	painel = new Painel(obsMundo, 2, 10, 512);
 
+	vector<vector<Cor>> m = painel->getMatrix();
+	/*
+	for (auto i = m.cbegin(); i != m.cend(); ++i) {
+		for (auto j = (*i).cbegin(); (*i) != objetos.cend(); ++i) {
+			Objeto* ob = (*i)->transforma(*obs);
+			ob->setMaterial((*i)->getMaterial());
+			obsMundo->addObjeto(ob);
+		}
+	}*/
+
+	
     // Create API window
 	RenderAPI::StartRenderAPI(argc, argv, width, height);
     
@@ -1302,5 +1316,6 @@ int main(int argc, char** argv) {
     //if i'm here is because the render loop was stopped and i'm exiting the application
 	//delete the pixel buffer
 	RenderAPI::DeleteVBO(&vbo);
+	
 	
 }

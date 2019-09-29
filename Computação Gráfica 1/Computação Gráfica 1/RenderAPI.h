@@ -5,7 +5,6 @@
 //	In this file we are using the OpenGL API, but can be easily changed without changing the main code
 //
 
-
 #include "GL/glew.h"
 #include "GL/glut.h"
 #include "GL/freeglut.h"
