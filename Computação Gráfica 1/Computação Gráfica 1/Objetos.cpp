@@ -313,14 +313,14 @@ class Observador{
             Vetor j = this->getJ();
             Vetor k = this->getK();
 
-            double a = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * i);
-            double b = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * j);
-            double c = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * k);
+            double a = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * i);
+            double b = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * j);
+            double c = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * k);
 
             vector<double> primeiraLinha = {i.getX(), i.getY(), i.getZ(), a};
             vector<double> segundalinha  = {j.getX(), j.getY(), j.getZ(), b};
             vector<double> terceiraLinha = {k.getX(), k.getY(), k.getZ(), c};
-            vector<double> quartalinha = {0,0,0,1};
+            vector<double> quartalinha	 = {0       , 0       , 0       , 1};
 
             vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
             this->matriz = new Matriz(matrizDeTransformacao);
@@ -449,9 +449,9 @@ class Objeto {
             return this->material;
         }
 
-		virtual Objeto* transforma(Observador obs) { return 0; }
-		virtual Vetor* getNormal(Ponto p) { return 0; }
-		virtual vector<Ponto> intRaio(Reta reta) { return {}; }
+		virtual Objeto* transforma(Observador obs)	{	return 0; }
+		virtual Vetor* getNormal(Ponto p) 			{	return 0; }
+		virtual vector<Ponto> intRaio(Reta reta)	{	return {};}
 
 };
 
@@ -518,6 +518,7 @@ class Triangulo : public Objeto {
             this->ponto1 = ponto1;
             this->ponto2 = ponto2;
             this->ponto3 = ponto3;
+
             this->adicionarVertice(ponto1);
             this->adicionarVertice(ponto2);
             this->adicionarVertice(ponto3);
@@ -572,7 +573,6 @@ class Triangulo : public Objeto {
         Objeto* transforma(Observador obs){
             return new Triangulo(obs.converte(ponto1),obs.converte(ponto2),obs.converte(ponto3));
         }
-
     
 };
 
@@ -648,15 +648,15 @@ class Cubo : public Objeto {
             this->adicionarFace(*p4, *p8, *p5);
             this->adicionarFace(*p4, *p5, *p1);
 
-            this->triangulo1 = new Triangulo(*p1, *p2, *p3);
-            this->triangulo2 = new Triangulo(*p1, *p3, *p4);
-            this->triangulo3 = new Triangulo(*p5, *p7, *p6);
-            this->triangulo4 = new Triangulo(*p5, *p8, *p7);
-            this->triangulo5 = new Triangulo(*p1, *p5, *p6);
-            this->triangulo6 = new Triangulo(*p1, *p6, *p2);
-            this->triangulo7 = new Triangulo(*p2, *p6, *p7);
-            this->triangulo8 = new Triangulo(*p2, *p7, *p3);
-            this->triangulo9 = new Triangulo(*p3, *p7, *p8);
+            this->triangulo1  = new Triangulo(*p1, *p2, *p3);
+            this->triangulo2  = new Triangulo(*p1, *p3, *p4);
+            this->triangulo3  = new Triangulo(*p5, *p7, *p6);
+            this->triangulo4  = new Triangulo(*p5, *p8, *p7);
+            this->triangulo5  = new Triangulo(*p1, *p5, *p6);
+            this->triangulo6  = new Triangulo(*p1, *p6, *p2);
+            this->triangulo7  = new Triangulo(*p2, *p6, *p7);
+            this->triangulo8  = new Triangulo(*p2, *p7, *p3);
+            this->triangulo9  = new Triangulo(*p3, *p7, *p8);
             this->triangulo10 = new Triangulo(*p3, *p8, *p4);
             this->triangulo11 = new Triangulo(*p4, *p8, *p5);
             this->triangulo12 = new Triangulo(*p4, *p5, *p1);
@@ -710,7 +710,7 @@ class Cubo : public Objeto {
 
 };
 
-class Esfera:public Objeto {  //TODO Testar
+class Esfera : public Objeto {  //TODO Testar
     protected:
         Ponto centro;
         double raio;
