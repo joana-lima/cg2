@@ -379,7 +379,7 @@ class Observador{
 
 class Objeto {
     protected:
-        static int icrementador;
+        static int incrementador;
 		int id;
         vector<Ponto> vertices;
         vector<vector<Ponto>> arestas;
@@ -393,8 +393,8 @@ class Objeto {
             this->arestas = {};
             this->faces = {};
             this->visibilidade = true;
-            this->id = icrementador;
-			icrementador++;
+            this->id = incrementador;
+			incrementador++;
         }
 
         int getId(){
@@ -483,7 +483,7 @@ class Objeto {
 
 };
 
-int Objeto::icrementador = 0;
+int Objeto::incrementador = 1;
 
 class Plano : public Objeto{
     protected:
