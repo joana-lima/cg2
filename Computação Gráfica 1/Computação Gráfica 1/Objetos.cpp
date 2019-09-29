@@ -705,7 +705,64 @@ class Cubo : public Objeto {
         }
 
         Vetor* getNormal(Ponto p){
+			Vetor* jCubo = vetorDistancia(this->vertices[4], this->vertices[0])->normalizar();
+			Plano planoTopo = Plano(this->vertices[0], *jCubo);
 
+			Vetor* jNegativoCubo = vetorDistancia(this->vertices[0], this->vertices[4])->normalizar();
+			Plano planoBase = Plano(this->vertices[7], *jNegativoCubo);
+
+			Vetor* iCubo = vetorDistancia(this->vertices[0], this->vertices[3])->normalizar();
+			Plano planoDireito = Plano(this->vertices[3], *iCubo);
+
+
+			Vetor* iNegativoCubo = vetorDistancia(this->vertices[3], this->vertices[0])->normalizar();
+			Plano  planoEsquerdo = Plano(this->vertices[0], *iNegativoCubo);
+
+			Vetor* kCubo = vetorDistancia(this->vertices[0], this->vertices[1])->normalizar();
+			Plano planoFrente = Plano(this->vertices[1], *kCubo);
+
+
+			Vetor* kNegativoCubo = vetorDistancia(this->vertices[1], this->vertices[0])->normalizar();
+			Plano  planoFundo = Plano(this->vertices[0], *kNegativoCubo);
+
+			vector< bool > planoAoQualPertence;
+			planoAoQualPertence.push_back(planoTopo.pertencePlano(p));
+			planoAoQualPertence.push_back(planoBase.pertencePlano(p));
+			planoAoQualPertence.push_back(planoDireito.pertencePlano(p));
+			planoAoQualPertence.push_back(planoEsquerdo.pertencePlano(p));
+			planoAoQualPertence.push_back(planoFrente.pertencePlano(p));
+			planoAoQualPertence.push_back(planoFundo.pertencePlano(p));
+
+			int idPlano = 0;
+			for (int i = 0; i < planoAoQualPertence.size(); i++) {
+				if (planoAoQualPertence[i] == true) {
+					idPlano = i;
+				}
+			}
+
+			switch (idPlano)
+			{
+			case 0:
+				return jCubo;
+				break;
+			case 1:
+				return jNegativoCubo;
+				break;
+			case 2:
+				return iCubo;
+				break;
+			case 3:
+				return iNegativoCubo;
+				break;
+			case 4:
+				return kCubo;
+				break;
+			case 5:
+				return kNegativoCubo;
+				break;
+			default:
+				break;
+			}
         }
 
 };
@@ -1485,7 +1542,7 @@ void testes() {
     cout << "\n---------Teste de Cubo-------------------" << endl;
     Cubo *cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0, Vetor(0.0, 1.0, 0.0));
     Reta *retaCuboMiss = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
-    Reta *retaCuboHit = new Reta(Ponto(0.0, 0.0, -1.0), Vetor(0.0, 0.0, -1.0));
+    Reta *retaCuboHit = new Reta(Ponto(0.0, 0.2, -1.0), Vetor(0.0, 0.0, -1.0));
 
     
     cout << "CUBO" << endl;
