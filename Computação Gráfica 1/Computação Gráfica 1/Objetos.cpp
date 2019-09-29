@@ -392,7 +392,8 @@ class Observador{
 
 class Objeto {
     protected:
-        int id = 0;
+        static int icrementador;
+		int id;
         vector<Ponto> vertices;
         vector<vector<Ponto>> arestas;
         vector<vector<Ponto>> faces;
@@ -405,7 +406,8 @@ class Objeto {
             this->arestas = {};
             this->faces = {};
             this->visibilidade = true;
-            this->id++;
+            this->id = icrementador;
+			icrementador++;
         }
 
         int getId(){
@@ -494,6 +496,7 @@ class Objeto {
 
 };
 
+int Objeto::icrementador = 0;
 
 class Plano : public Objeto{
     protected:
@@ -1250,14 +1253,18 @@ int theModifierState = 0;
 // camera mouse controls in X and Y direction
 void motion(int x, int y)
 {
-}
-
-void mouse(int button, int state, int x, int y)
-{
 	cout << x << " " << y << endl;
 	Pixel* p = new Pixel(*painel->getCenter(x, y), *obsMundo->getObservador()->getPosicao(), obsMundo);
 	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
 	else cout << "None" << endl;
+}
+
+void mouse(int button, int state, int x, int y)
+{/*
+	cout << x << " " << y << endl;
+	Pixel* p = new Pixel(*painel->getCenter(x, y), *obsMundo->getObservador()->getPosicao(), obsMundo);
+	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
+	else cout << "None" << endl;*/
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -1274,35 +1281,40 @@ void resize(int w, int h) {
 
 // Main.
 int main(int argc, char** argv) {
-
+	
     // teste();
 	Mundo* mundo = new Mundo(*new Vetor(0.1, 0.1, 0.1));
 	Objeto* cilindro = new Cilindro(*new Ponto(7, 5, 0), *new Vetor(0, -1, 0), 1.0, 5.0);
 	cilindro->setMaterial(new Vetor(0.58, 0.29, 0));
 	mundo->addObjeto(cilindro);
 
+	cout << cilindro->getId() << endl;
+
 	Objeto* cone = new Cone(*new Ponto(7, 0, 0), *new Vetor(0, -1, 0), 3.0, 5.0);
 	cone->setMaterial(new Vetor(0, 0.8, 0));
 	mundo->addObjeto(cone);
+
+	cout << cone->getId() << endl;
 
 	/*
 	Objeto* esfera1 = new Esfera(*new Ponto(7, 5, 2), 1);
 	esfera1->setMaterial(new Vetor(0, 0.8, 0));
 	mundo->addObjeto(esfera1);
-	*/
+	
 
-	/*
+	
 	Objeto* esfera2 = new Esfera(*new Ponto(7, 5, -2), 1);
 	esfera2->setMaterial(new Vetor(0, 0.8, 0));
 	mundo->addObjeto(esfera2);
-	*/
-	/*
+	
+	
 	Objeto* plano = new Plano(*new Ponto(0, 0, 0), *new Vetor(0, 1, 0));
 	plano->setMaterial(new Vetor(0, 0, 0));
 	mundo->addObjeto(plano);
 	*/
 
-	mundo->addLuz(new Luz(*new Ponto(7, 7, 0), *new Vetor(0.3, 0.3, 0.3)));
+
+	mundo->addLuz(new Luz(*new Ponto(0, 0, 0), *new Vetor(0.3, 0.3, 0.3)));
 
 	Observador* observador = new Observador(*new Ponto(0, -1, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
 	obsMundo = mundo->obsMundo(observador);
@@ -1329,4 +1341,5 @@ int main(int argc, char** argv) {
     //if i'm here is because the render loop was stopped and i'm exiting the application
 	//delete the pixel buffer
 	RenderAPI::DeleteVBO(&vbo);
+	
 }
