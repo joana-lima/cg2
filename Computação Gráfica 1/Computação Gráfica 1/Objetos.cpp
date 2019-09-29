@@ -1679,6 +1679,12 @@ int main(int argc, char** argv) {
 
         cout << cone->getId() << endl;
 
+		Cubo* cubo1 = new Cubo(Ponto(7, 2, -6), 2.0, Vetor(0.0, 1.0, 0.0));
+		cubo1->setMaterial(new Vetor(0.8, 0.8, 0.8));
+		// mundo->addObjeto(cubo1);
+
+		cout << cubo1->getId() << endl;
+
         /*
         Objeto* esfera1 = new Esfera(*new Ponto(7, 5, 2), 1);
         esfera1->setMaterial(new Vetor(0, 0.8, 0));
