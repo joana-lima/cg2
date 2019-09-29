@@ -2,7 +2,6 @@
 #include <math.h>
 #include <vector>
 #include "RenderAPI.h"
-//#include <bits/stdc++.h>
 #include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
@@ -80,51 +79,13 @@ class Matriz {
         }
 };
 
-class Cor {
-    protected:
-        int r;
-        int g;
-        int b;
-
-    public:
-        Cor(){
-            this->r = 0;
-            this->g = 0;
-            this->b = 0;
-        }
-
-        Cor(int r, int g, int b){
-            this->r = r;
-            this->g = g;
-            this->b = b;
-        }
-
-        int getR(){
-            return this->r;
-        }
-
-        int getG(){
-            return this->g;
-        }
-
-        int getB(){
-            return this->b;
-        }
-
-        void setCor(int r, int g, int b){
-            this->r = r;
-            this->g = g;
-            this->b = b;
-        }
-};
-
 class Ponto {
     protected:
         int id = 0;
         double x;
         double y;
         double z;
-        vector<float> cor;
+        //Cor cor;
 
     public:
         Ponto() {
@@ -169,16 +130,16 @@ class Ponto {
             this->z = z;
         }
 
-        vector<float> getCor() {
-            return this->cor;
-        }
-        
-        void setCor(float red, float green, float blue) {
-            this->cor = {red, green, blue};
-        }
+   //     Cor getCor() {
+			//return this->cor;
+   //     }
+
+   //     void setCor(float red, float green, float blue) {
+   //         this->cor = {red, green, blue};
+   //     }
 
         void print() {
-            cout << "Ponto - X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << endl;
+            cout << "Ponto " << this->id << ": (X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << ")" << endl;
         }
 };
 
@@ -214,7 +175,7 @@ class Vetor: public Ponto {
         }
         
         void print() {
-            cout << "Vetor [X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "]";// << "\n" << endl;
+            cout << "Vetor " << this->id << " [X:" << this->x << "; Y:" << this->y << "; Z:" << this->z << "]" << endl;
         }
 
         Vetor operator + (Vetor const &obj) { 
@@ -352,14 +313,14 @@ class Observador{
             Vetor j = this->getJ();
             Vetor k = this->getK();
 
-            double a = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * i);
-            double b = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * j);
-            double c = - (*vetorDistancia(*new Vetor(0,0,0),posicao) * k);
+            double a = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * i);
+            double b = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * j);
+            double c = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * k);
 
             vector<double> primeiraLinha = {i.getX(), i.getY(), i.getZ(), a};
             vector<double> segundalinha  = {j.getX(), j.getY(), j.getZ(), b};
             vector<double> terceiraLinha = {k.getX(), k.getY(), k.getZ(), c};
-            vector<double> quartalinha = {0,0,0,1};
+            vector<double> quartalinha	 = {0       , 0       , 0       , 1};
 
             vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
             this->matriz = new Matriz(matrizDeTransformacao);
@@ -490,9 +451,9 @@ class Objeto {
             return this->material;
         }
 
-		virtual Objeto* transforma(Observador obs) { return 0; }
-		virtual Vetor* getNormal(Ponto p) { return 0; }
-		virtual vector<Ponto> intRaio(Reta reta) { return {}; }
+		virtual Objeto* transforma(Observador obs)	{	return 0; }
+		virtual Vetor* getNormal(Ponto p) 			{	return 0; }
+		virtual vector<Ponto> intRaio(Reta reta)	{	return {};}
 
 };
 
@@ -560,6 +521,7 @@ class Triangulo : public Objeto {
             this->ponto1 = ponto1;
             this->ponto2 = ponto2;
             this->ponto3 = ponto3;
+
             this->adicionarVertice(ponto1);
             this->adicionarVertice(ponto2);
             this->adicionarVertice(ponto3);
@@ -614,7 +576,6 @@ class Triangulo : public Objeto {
         Objeto* transforma(Observador obs){
             return new Triangulo(obs.converte(ponto1),obs.converte(ponto2),obs.converte(ponto3));
         }
-
     
 };
 
@@ -690,15 +651,15 @@ class Cubo : public Objeto {
             this->adicionarFace(*p4, *p8, *p5);
             this->adicionarFace(*p4, *p5, *p1);
 
-            this->triangulo1 = new Triangulo(*p1, *p2, *p3);
-            this->triangulo2 = new Triangulo(*p1, *p3, *p4);
-            this->triangulo3 = new Triangulo(*p5, *p7, *p6);
-            this->triangulo4 = new Triangulo(*p5, *p8, *p7);
-            this->triangulo5 = new Triangulo(*p1, *p5, *p6);
-            this->triangulo6 = new Triangulo(*p1, *p6, *p2);
-            this->triangulo7 = new Triangulo(*p2, *p6, *p7);
-            this->triangulo8 = new Triangulo(*p2, *p7, *p3);
-            this->triangulo9 = new Triangulo(*p3, *p7, *p8);
+            this->triangulo1  = new Triangulo(*p1, *p2, *p3);
+            this->triangulo2  = new Triangulo(*p1, *p3, *p4);
+            this->triangulo3  = new Triangulo(*p5, *p7, *p6);
+            this->triangulo4  = new Triangulo(*p5, *p8, *p7);
+            this->triangulo5  = new Triangulo(*p1, *p5, *p6);
+            this->triangulo6  = new Triangulo(*p1, *p6, *p2);
+            this->triangulo7  = new Triangulo(*p2, *p6, *p7);
+            this->triangulo8  = new Triangulo(*p2, *p7, *p3);
+            this->triangulo9  = new Triangulo(*p3, *p7, *p8);
             this->triangulo10 = new Triangulo(*p3, *p8, *p4);
             this->triangulo11 = new Triangulo(*p4, *p8, *p5);
             this->triangulo12 = new Triangulo(*p4, *p5, *p1);
@@ -752,7 +713,7 @@ class Cubo : public Objeto {
 
 };
 
-class Esfera:public Objeto {  //TODO Testar
+class Esfera : public Objeto {  //TODO Testar
     protected:
         Ponto centro;
         double raio;
@@ -1129,7 +1090,7 @@ class Pixel{
             return solutions;
         }
 
-        Color getColor(){
+        Cor getCor(){
             if(solutions.size() != 0) {
                 Vetor *Id = new Vetor(0,0,0);
                 Vetor *Is = new Vetor(0,0,0);
@@ -1160,9 +1121,9 @@ class Pixel{
                 }
             
                 Ia = Ia+*Id+*Is;
-                return Color(Ia.getX(), Ia.getY(), Ia.getZ());
+                return Cor(Ia.getX(), Ia.getY(), Ia.getZ());
             }
-            return Color(1,1,1);
+            return Cor(1,1,1);
         }
 };
 
@@ -1173,7 +1134,7 @@ class Painel{
         double lado;
         int pixels;
         Mundo* obsMundo;
-        vector<vector<Color>> mtrx;
+        vector<vector<Cor>> mtrx;
 
     public:
         Painel(Mundo* obsMundo, double distancia, double lado, int pixels){
@@ -1182,13 +1143,13 @@ class Painel{
             this->lado = lado;
             this->pixels = pixels;
 
-            vector<Color> linhas;
+            vector<Cor> linhas;
             for(int i = 0; i < pixels; i++){
                 for(int j = 0; j < pixels; j++){
                     Pixel* pixel = new Pixel(*getCenter(i,j), *obsMundo->getObservador()->getPosicao(), obsMundo);
 					//Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
 
-					linhas.push_back(pixel->getColor());
+					linhas.push_back(pixel->getCor());
                 }
 
                 mtrx.push_back(linhas);
@@ -1197,7 +1158,7 @@ class Painel{
 
         }
 
-        vector<vector<Color>> getMatrix(){
+        vector<vector<Cor>> getMatrix(){
             return mtrx;
         }
 
@@ -1228,7 +1189,7 @@ Mundo* obsMundo;
 void disp(void){
     
  
-    vector<vector<Color>> colorBuffer = painel->getMatrix();
+    vector<vector<Cor>> colorBuffer = painel->getMatrix();
 
 	
 	//Remove the old frame from the buffer

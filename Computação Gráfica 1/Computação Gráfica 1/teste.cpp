@@ -283,11 +283,11 @@ int teste() {
     mundo->addObjeto(cilindro);
 
     Observador* observador = new Observador(*new Ponto(0,0,0), *new Ponto(7,2,0), *new Ponto(0,1,0));
-    Mundo *obsMundo = mundo->obsMundo(*observador);  
+    Mundo *obsMundo = mundo->obsMundo(observador);  
     
 
     Painel *painel = new Painel(obsMundo, 2, 10, 25);
-    vector<vector<Color>> mtrx = painel->getMatrix();
+    vector<vector<Cor>> mtrx = painel->getMatrix();
     int pixels=25; 
     for (int i = 0; i < pixels; i++){
         for (int j = 0; j < pixels; j++){

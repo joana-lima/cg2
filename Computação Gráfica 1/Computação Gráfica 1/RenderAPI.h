@@ -10,17 +10,41 @@
 #include "GL/glut.h"
 #include "GL/freeglut.h"
 
-class Color {
+class Cor {
     public:
-    float r;
-    float g;
-    float b;
+		float r;
+		float g;
+		float b;
 
-	Color(float r, float g, float b) {
-		this->r = r;
-		this->g = g;
-		this->b = b;
-	}
+		Cor(){
+            this->r = 0.0;
+            this->g = 0.0;
+            this->b = 0.0;
+        }
+
+		Cor(float r, float g, float b) {
+			this->r = r;
+			this->g = g;
+			this->b = b;
+		}
+
+		// float getR(){
+        //     return this->r;
+        // }
+
+        // float getG(){
+        //     return this->g;
+        // }
+
+        // float getB(){
+        //     return this->b;
+        // }
+
+        // void setCor(float r, float g, float b){
+        //     this->r = r;
+        //     this->g = g;
+        //     this->b = b;
+        // }
 };
 
 namespace RenderAPI{
@@ -110,11 +134,11 @@ namespace RenderAPI{
 
 	//TODO: Use your color struct here
 	//Map the buffer data to the graphics card 
-	inline void MapBuffer(std::vector< std::vector< Color >> color_buffer, int width, int height){
+	inline void MapBuffer(std::vector< std::vector< Cor >> color_buffer, int width, int height){
 		//get the graphics card actual buffer
 		float *buffer = (float*) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 		if (!buffer)return;
-		std::vector <std::vector< Color >> c_buff = color_buffer;
+		std::vector <std::vector< Cor >> c_buff = color_buffer;
 		
 		
 		for (int y = 0; y < height; y++) {
