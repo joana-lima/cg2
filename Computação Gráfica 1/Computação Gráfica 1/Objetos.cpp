@@ -79,9 +79,10 @@ class Matriz {
         }
 };
 
+int pontoID = 1;
 class Ponto {
     protected:
-        int id = 0;
+		int id;
         double x;
         double y;
         double z;
@@ -92,14 +93,16 @@ class Ponto {
             this->x = 0;
             this->y = 0;
             this->z = 0;
-            this->id++;
+            this->id = pontoID;
+			pontoID++;
         }
         
         Ponto(double x, double y, double z) {
             this->x = x;
             this->y = y;
             this->z = z;
-            this->id++;
+			this->id = pontoID;
+			pontoID++;
         }
 
         int getID() {
@@ -138,17 +141,40 @@ class Ponto {
    //         this->cor = {red, green, blue};
    //     }
 
+		bool igual(Ponto *p) {
+			if (this->x == p->getX() && this->y == p->getY() && this->z == p->getZ()) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
         void print() {
-            cout << "Ponto " << this->id << ": (X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << ")" << endl;
+            cout << "Ponto " << this->id << " (X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << ")" << endl;
         }
 };
 
+int vetorID = 1;
 class Vetor: public Ponto {
     public:
-        Vetor(): Ponto() {}
-        Vetor(double x, double y, double z) : Ponto(x,y,z){}
+        Vetor() {
+			this->x = 0;
+			this->y = 0;
+			this->z = 0;
+			this->id = vetorID;
+			vetorID++;
+		}
 
-        double produtoEscalar(Vetor vetor){
+        Vetor(double x, double y, double z) {
+			this->x = x;
+			this->y = y;
+			this->z = z;
+			this->id = vetorID;
+			vetorID++;
+		}
+
+        double produtoEscalar(Vetor vetor) {
             double resultado;
             resultado = (this->x*vetor.getX()) + (this->y*vetor.getY()) + (this->z*vetor.getZ());
             return resultado;
