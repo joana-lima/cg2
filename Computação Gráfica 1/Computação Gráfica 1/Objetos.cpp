@@ -85,7 +85,7 @@ class Ponto {
         double x;
         double y;
         double z;
-        vector<float> cor;
+        //Cor cor;
 
     public:
         Ponto() {
@@ -130,16 +130,16 @@ class Ponto {
             this->z = z;
         }
 
-        vector<float> getCor() {
-            return this->cor;
-        }
-        
-        void setCor(float red, float green, float blue) {
-            this->cor = {red, green, blue};
-        }
+   //     Cor getCor() {
+			//return this->cor;
+   //     }
+
+   //     void setCor(float red, float green, float blue) {
+   //         this->cor = {red, green, blue};
+   //     }
 
         void print() {
-            cout << "Ponto - X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << endl;
+            cout << "Ponto " << this->id << ": (X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << ")" << endl;
         }
 };
 
@@ -175,7 +175,7 @@ class Vetor: public Ponto {
         }
         
         void print() {
-            cout << "Vetor [X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << "]";// << "\n" << endl;
+            cout << "Vetor " << this->id << " [X:" << this->x << "; Y:" << this->y << "; Z:" << this->z << "]" << endl;
         }
 
         Vetor operator + (Vetor const &obj) { 
