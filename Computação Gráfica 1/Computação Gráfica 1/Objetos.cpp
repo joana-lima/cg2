@@ -719,14 +719,22 @@ class Cubo : public Objeto {
             pontosIntRaio.push_back(this->triangulo11->intRaio(raio));
             pontosIntRaio.push_back(this->triangulo12->intRaio(raio));
 
-            vector<Ponto> pontosIntRaioOutput;
+            vector<Ponto> pontosIntRaioMeio;
             for(int i = 0; i < pontosIntRaio.size(); i++){
                 if(pontosIntRaio[i].size() > 0){
-                    pontosIntRaioOutput.push_back(pontosIntRaio[i][0]);
+                    pontosIntRaioMeio.push_back(pontosIntRaio[i][0]);
                 }
             }
 
-            return pontosIntRaioOutput;
+			vector<Ponto> pontosIntRaioFim;		// Checagem do caso em que o ponto de interseção passa pela diagonal da face do cubo, retornando, erroneamente, dois pontos de interseção (1 ponto para cada triangulo daquela face)
+			if (pontosIntRaioMeio.size() == 4) {
+				pontosIntRaioFim.push_back(pontosIntRaioMeio[0]);
+				pontosIntRaioFim.push_back(pontosIntRaioMeio[2]);
+
+				return pontosIntRaioFim;
+			}
+
+			return pontosIntRaioMeio;
         }
         
         Objeto* transforma(Observador obs){
