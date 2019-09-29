@@ -1434,9 +1434,11 @@ void testes() {
     Vetor *vetor6 = new Vetor(3,-2,0);
     Vetor *vetor7 = new Vetor(0,0,1);
 
-    // **********INICIO TESTE DA CLASSE VETOR***************
+	// **********INICIO TESTE DA CLASSE VETOR***************
 
     cout << "\n-----------Teste print------------" << endl;
+	ponto1->print();
+	ponto3->print();
     vetor1->print();
     vetor2->print();
 
@@ -1571,11 +1573,12 @@ void testes() {
     for(int i = 0; i < intTrianguloHit.size(); i++){
         intTrianguloHit[i].print();
     }
-*/
+	*/
+
     cout << "\n---------Teste de Cubo-------------------" << endl;
     Cubo *cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0, Vetor(0.0, 1.0, 0.0));
     Reta *retaCuboMiss = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
-    Reta *retaCuboHit = new Reta(Ponto(0.0, 0.2, -1.0), Vetor(0.0, 0.0, -1.0));
+    Reta *retaCuboHit = new Reta(Ponto(0.0, 0.0, -1.0), Vetor(0.0, 0.0, -1.0));
 
     
     cout << "CUBO" << endl;
@@ -1600,7 +1603,7 @@ void testes() {
         cubo->getNormal(intCuboHit[i])->print();
     }
 
-/*
+	/*
     Mundo *mundo = new Mundo(*new Vetor(1,1,1));
     Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
     cilindro->setMaterial(new Vetor(1,1,1));
