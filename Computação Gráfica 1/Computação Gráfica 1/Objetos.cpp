@@ -2,7 +2,6 @@
 #include <math.h>
 #include <vector>
 #include "RenderAPI.h"
-//#include <bits/stdc++.h>
 #include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
@@ -77,44 +76,6 @@ class Matriz {
                 
                 return C;
             }
-        }
-};
-
-class Cor {
-    protected:
-        int r;
-        int g;
-        int b;
-
-    public:
-        Cor(){
-            this->r = 0;
-            this->g = 0;
-            this->b = 0;
-        }
-
-        Cor(int r, int g, int b){
-            this->r = r;
-            this->g = g;
-            this->b = b;
-        }
-
-        int getR(){
-            return this->r;
-        }
-
-        int getG(){
-            return this->g;
-        }
-
-        int getB(){
-            return this->b;
-        }
-
-        void setCor(int r, int g, int b){
-            this->r = r;
-            this->g = g;
-            this->b = b;
         }
 };
 
@@ -1126,7 +1087,7 @@ class Pixel{
             return solutions;
         }
 
-        Color getColor(){
+        Cor getCor(){
             if(solutions.size() != 0) {
                 Vetor *Id = new Vetor(0,0,0);
                 Vetor *Is = new Vetor(0,0,0);
@@ -1157,9 +1118,9 @@ class Pixel{
                 }
             
                 Ia = Ia+*Id+*Is;
-                return Color(Ia.getX(), Ia.getY(), Ia.getZ());
+                return Cor(Ia.getX(), Ia.getY(), Ia.getZ());
             }
-            return Color(1,1,1);
+            return Cor(1,1,1);
         }
 };
 
@@ -1170,7 +1131,7 @@ class Painel{
         double lado;
         int pixels;
         Mundo* obsMundo;
-        vector<vector<Color>> mtrx;
+        vector<vector<Cor>> mtrx;
 
     public:
         Painel(Mundo* obsMundo, double distancia, double lado, int pixels){
@@ -1179,13 +1140,13 @@ class Painel{
             this->lado = lado;
             this->pixels = pixels;
 
-            vector<Color> linhas;
+            vector<Cor> linhas;
             for(int i = 0; i < pixels; i++){
                 for(int j = 0; j < pixels; j++){
                     Pixel* pixel = new Pixel(*getCenter(i,j), *obsMundo->getObservador()->getPosicao(), obsMundo);
 					//Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
 
-					linhas.push_back(pixel->getColor());
+					linhas.push_back(pixel->getCor());
                 }
 
                 mtrx.push_back(linhas);
@@ -1194,7 +1155,7 @@ class Painel{
 
         }
 
-        vector<vector<Color>> getMatrix(){
+        vector<vector<Cor>> getMatrix(){
             return mtrx;
         }
 
@@ -1225,7 +1186,7 @@ Mundo* obsMundo;
 void disp(void){
     
  
-    vector<vector<Color>> colorBuffer = painel->getMatrix();
+    vector<vector<Cor>> colorBuffer = painel->getMatrix();
 
 	
 	//Remove the old frame from the buffer
