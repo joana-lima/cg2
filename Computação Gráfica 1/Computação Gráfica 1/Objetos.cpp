@@ -1668,8 +1668,8 @@ int main(int argc, char** argv) {
         
     	Mundo* mundo = new Mundo(*new Vetor(0.1, 0.1, 0.1));
         Objeto* cilindro = new Cilindro(*new Ponto(7, 5, 0), *new Vetor(0, -1, 0), 1.0, 5.0);
-        cilindro->setMaterial(new Vetor(0.58, 0.29, 0));
-        mundo->addObjeto(cilindro);
+        cilindro->setMaterial(new Vetor(0.58, 0.29, 0));        
+		mundo->addObjeto(cilindro);
 
         cout << cilindro->getId() << endl;
 
