@@ -291,6 +291,55 @@ vector<double> equacaoSegundoGrau(double a, double b, double c) {
     }
 }
 
+class Quaternio {
+    public:
+        double x;    // vetor do eixo de rotação, que passa pela origem
+        double y;
+        double z;
+        double w; // angulo da rotação ao redor do eixo
+
+        Quaternio(){    // Quaternio neutro
+            x = 0;
+            y = 0;
+            z = 0;
+            w = 1;
+        }
+
+        Quaternio(Vetor *v, double w){
+            x = v->getX();
+            y = v->getY();
+            z = v->getZ();
+            w = w;
+        }
+
+        void normalizar(){
+            double magnitude = sqrt(x*x + y*y + z*z + w*w);
+            x /= magnitude;
+            y = magnitude;
+            z /= magnitude;
+            w /= magnitude;
+        }
+
+        Quaternio* operator * (Quaternio *q2){
+            Quaternio *q1 = this;
+            Quaternio *qOut = new Quaternio();
+            
+            qOut->w = q1->w*q2->w - q1->x*q2->x - q1->y*q2->y - q1->z*q2->z;
+            qOut->x = q1->w*q2->x + q2->w*q1->x + q1->y*q2->z - q1->z*q2->y;
+            qOut->y = q1->w*q2->y + q2->w*q1->y + q1->z*q2->x - q1->x*q2->z;
+            qOut->z = q1->w*q2->z + q2->w*q1->z + q1->x*q2->y - q1->y*q2->x;
+
+            return qOut;
+        }
+
+        Matriz* rotacao(){
+            vector< vector< double >> m = {{w*w + x*x - y*y - z*z, 2*x*y - 2*w*y, 2*x*z + 2*w*y, 0},
+                                           {2*x*y + 2*w*z, w*w - x*x + y*y - z*z, 2*y*z + 2*w*x, 0},
+                                           {2*x*z - 2*w*y, 2*y*z - 2*w*x, w*w - x*x - y*y + z*z, 0},
+                                           {0            , 0           , 0                     , 1}};
+        }
+};
+
 class Reta {
     protected:
         Ponto ponto;
