@@ -250,7 +250,7 @@ int teste() {
     for(int i = 0; i < intTrianguloHit.size(); i++){
         intTrianguloHit[i].print();
     }
-
+*/
     cout << "\n---------Teste de Cubo-------------------" << endl;
     Cubo *cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0, Vetor(0.0, 1.0, 0.0));
     Reta *retaCuboMiss = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
@@ -272,11 +272,14 @@ int teste() {
     cout << "\ninicio de teste que deve acertar:\n";
     for(int i = 0; i < intCuboHit.size(); i++){
         intCuboHit[i].print();
-    }*/
+    }
 
+    cout << "\ninicio de teste das normais nos pontos de intereseção:\n";
+    for(int i = 0; i < intCuboHit.size(); i++){
+        cubo->getNormal(intCuboHit[i])->print();
+    }
 
-
-
+/*
     Mundo *mundo = new Mundo(*new Vetor(1,1,1));
     Objeto *cilindro = new Cilindro(*new Ponto(7,0,0), *new Vetor(0,1,0), 3.0, 7.0);
     cilindro->setMaterial(new Vetor(1,1,1));
@@ -296,7 +299,6 @@ int teste() {
         cout << endl;
     }
 
-/*
 
     cout << "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK \n\n";
     Reta *reta = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
