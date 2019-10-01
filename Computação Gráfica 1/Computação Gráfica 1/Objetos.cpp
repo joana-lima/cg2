@@ -1232,6 +1232,10 @@ class Pixel{
             return solutions;
         }
 
+		Reta* getReta() {
+			return reta;
+		}
+
         Cor getCor(){
             if(solutions.size() != 0) {
                 Vetor *Id = new Vetor(0,0,0);
@@ -1361,12 +1365,35 @@ void motion(int x, int y)
 	
 }
 
+
+Pixel* p1 = NULL;
+Pixel* p2 = NULL;
 void mouse(int button, int state, int x, int y)
 {
-	
-	Pixel* p = new Pixel(*painel->getCenter(y, x), *new Ponto(0,0,0), obsMundo);
-	if (p->getSolutions().size() != 0) cout << p->getSolutions().front().second->getId() << endl;
-	else cout << "None" << endl;
+	if (button == GLUT_LEFT_BUTTON) {
+		
+		if (state == GLUT_DOWN) {
+			p1 = new Pixel(*painel->getCenter(y, x), *new Ponto(0, 0, 0), obsMundo);
+			if (p1->getSolutions().size() != 0) cout << p1->getSolutions().front().second->getId() << endl;
+			else cout << "None" << endl;
+		}
+
+		if (state == GLUT_UP) {
+
+			p2 = new Pixel(*painel->getCenter(y, x), *new Ponto(0, 0, 0), obsMundo);
+			if (p2->getSolutions().size() != 0) cout << p2->getSolutions().front().second->getId() << endl;
+			else cout << "None" << endl;
+			
+			
+			if (p1->getSolutions().size() != 0 && p2->getSolutions().size() != 0 && p1->getSolutions().front().second->getId() == p2->getSolutions().front().second->getId()) {
+				Ponto inicio = *p1->getReta()->pontoAtingido(p1->getSolutions().front().first);
+				Ponto fim = *p2->getReta()->pontoAtingido(p1->getSolutions().front().first);
+				Vetor eixo = *vetorDistancia(inicio, fim);
+			}
+		}
+
+		
+	}
 	
 }
 
