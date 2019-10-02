@@ -86,7 +86,6 @@ class Ponto {
         double x;
         double y;
         double z;
-        //Cor cor;
 
     public:
         Ponto() {
@@ -305,11 +304,11 @@ class Quaternio {
             w = 1;
         }
 
-        Quaternio(Vetor *v, double w){
+        Quaternio(Vetor *v, double wA){
             x = v->getX();
             y = v->getY();
             z = v->getZ();
-            w = w;
+            w = wA;
         }
 
         void normalizar(){
@@ -595,7 +594,7 @@ class Triangulo : public Objeto {
         Ponto ponto1;
         Ponto ponto2;
         Ponto ponto3;
-    public:
+
         Triangulo() : Objeto() {}
         
         Triangulo(Ponto ponto1, Ponto ponto2, Ponto ponto3) {
@@ -606,45 +605,57 @@ class Triangulo : public Objeto {
             this->adicionarVertice(ponto1);
             this->adicionarVertice(ponto2);
             this->adicionarVertice(ponto3);
-
+			/*
             this->adicionarAresta(ponto1, ponto2);
             this->adicionarAresta(ponto2, ponto3);
             this->adicionarAresta(ponto3, ponto1);
 
-            this->adicionarFace(ponto1, ponto2, ponto3);
+            this->adicionarFace(ponto1, ponto2, ponto3)*/;
         }
 
-        vector<Ponto> intRaio(Reta raio) {
+		vector<Ponto> intRaio(Reta raio) {
 
-            Vetor* p1p2 = vetorDistancia(vertices[1], vertices[0]);
-            Vetor* p1p3 = vetorDistancia(vertices[2], vertices[0]);
-            Vetor* p2p3 = vetorDistancia(vertices[2], vertices[1]);
-            Vetor* p3p1 = vetorDistancia(vertices[0], vertices[2]);
-            Vetor* n = p1p2->produtoVetorial(*p1p3)->normalizar();
+			Vetor* p1p2 = vetorDistancia(vertices[0], vertices[1]);
+			Vetor* p1p3 = vetorDistancia(vertices[0], vertices[2]);
+			Vetor* p2p3 = vetorDistancia(vertices[1], vertices[2]);
+			Vetor* p3p1 = vetorDistancia(vertices[2], vertices[0]);
+			Vetor* n = p1p2->produtoVetorial(*p1p3)->normalizar();
 
-            Plano* planoTriangulo = new Plano(vertices[0], *n);
-            vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
+			Plano* planoTriangulo = new Plano(vertices[0], *n);
+			vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
 
-            if(pontoInt.size() == 0){
-                return pontoInt;
-            };
+			if (pontoInt.size() == 0) {
+				return pontoInt;
+			};
 
-            Vetor* p1p = vetorDistancia(pontoInt[0], vertices[0]);
-            Vetor* p2p = vetorDistancia(pontoInt[0], vertices[1]);
-            Vetor* p3p = vetorDistancia(pontoInt[0], vertices[2]);
+			Vetor* p1p = vetorDistancia(vertices[0], pontoInt[0]);
+			Vetor* p2p = vetorDistancia(vertices[1], pontoInt[0]);
+			Vetor* p3p = vetorDistancia(vertices[2], pontoInt[0]);
 
-            Vetor* p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
-            double sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
-            double sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
-            double sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
+			Vetor* p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
+			double sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
+			double sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
+			double sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
 
-            if(sE >= 0 && sN >= 0 && sS >= 0){
-                return pontoInt;
-            } else {
-                pontoInt.clear();
-                return pontoInt;
-            }
-        }
+			free(p1p2);
+			free(p1p3);
+			free(p2p3);
+			free(p3p1);
+			free(n);
+			delete(planoTriangulo);
+			free(p1p);
+			free(p2p);
+			free(p3p);
+			free(p1p2xp1p3);
+
+			if (sE >= 0 && sN >= 0 && sS >= 0) {
+				return pontoInt;
+			}
+			else {
+				pontoInt.clear();
+				return pontoInt;
+			}
+		}
 
         Vetor* getNormal(Ponto p){
             Vetor* p1p2 = vetorDistancia(vertices[1], vertices[0]);
@@ -682,11 +693,10 @@ class Cubo : public Objeto {
     public:
         Cubo() : Objeto() {}
 
-        Cubo(Ponto centro, float largura, Vetor direcao){
+        Cubo(Ponto centro, float largura){
             this->centro = centro;
             this->largura = largura;
-            this->direcao = direcao;
-            
+
             double ml = largura/2;  //Meia Largura: ml
             Ponto* p1 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() - ml);
             Ponto* p2 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() + ml);
@@ -706,7 +716,7 @@ class Cubo : public Objeto {
             this->adicionarVertice(*p7);
             this->adicionarVertice(*p8);
             
-            this->adicionarAresta(*p1, *p2);
+           /* this->adicionarAresta(*p1, *p2);
             this->adicionarAresta(*p2, *p3);
             this->adicionarAresta(*p3, *p4);
             this->adicionarAresta(*p4, *p1);
@@ -730,7 +740,7 @@ class Cubo : public Objeto {
             this->adicionarFace(*p3, *p7, *p8);
             this->adicionarFace(*p3, *p8, *p4);
             this->adicionarFace(*p4, *p8, *p5);
-            this->adicionarFace(*p4, *p5, *p1);
+            this->adicionarFace(*p4, *p5, *p1);*/
 
             this->triangulo1  = new Triangulo(*p1, *p2, *p3);
             this->triangulo2  = new Triangulo(*p1, *p3, *p4);
@@ -781,80 +791,65 @@ class Cubo : public Objeto {
                 }
             }
 
-			vector<Ponto> pontosIntRaioFim;		// Checagem do caso em que o ponto de interseção passa pela diagonal da face do cubo, retornando, erroneamente, dois pontos de interseção (1 ponto para cada triangulo daquela face)
-			if (pontosIntRaioMeio.size() == 4) {
-				pontosIntRaioFim.push_back(pontosIntRaioMeio[0]);
-				pontosIntRaioFim.push_back(pontosIntRaioMeio[2]);
+			vector<Ponto> pontosIntRaioFim;    // Checagem do caso em que o ponto de interseção retorna, erroneamente, pontos repetidos
+			bool repetido = false;
 
+			if (pontosIntRaioMeio.size() > 1) {
+				for (int i = 0; i < pontosIntRaioMeio.size(); i++) {
+					for (int j = 0; j < pontosIntRaioFim.size(); j++) {
+						repetido = false;
+						if (pontosIntRaioMeio[i].igual(&pontosIntRaioFim[j])) {
+							repetido = true;
+						}
+					}
+
+					if (repetido == false) {
+						pontosIntRaioFim.push_back(pontosIntRaioMeio[i]);
+					}
+				}
+
+				/*if (pontosIntRaioMeio.size() != 0) {
+					free(&pontosIntRaioMeio);
+				}*/
 				return pontosIntRaioFim;
 			}
-
-			return pontosIntRaioMeio;
+			else {
+				return pontosIntRaioMeio;
+			}
         }
         
         Objeto* transforma(Observador obs){
-            return new Cubo(obs.converte(centro), largura, *vetorDistancia(*new Ponto(0,0,0) , obs.converte(direcao)));
+            return new Cubo(obs.converte(centro), largura);
         }
 
         Vetor* getNormal(Ponto p){
-			Vetor* jCubo = vetorDistancia(this->vertices[4], this->vertices[0])->normalizar();
-			Plano planoTopo = Plano(this->vertices[0], *jCubo);
-
-			Vetor* jNegativoCubo = vetorDistancia(this->vertices[0], this->vertices[4])->normalizar();
-			Plano planoBase = Plano(this->vertices[7], *jNegativoCubo);
-
 			Vetor* iCubo = vetorDistancia(this->vertices[0], this->vertices[3])->normalizar();
-			Plano planoDireito = Plano(this->vertices[3], *iCubo);
-
-
 			Vetor* iNegativoCubo = vetorDistancia(this->vertices[3], this->vertices[0])->normalizar();
-			Plano  planoEsquerdo = Plano(this->vertices[0], *iNegativoCubo);
-
+			Vetor* jCubo = vetorDistancia(this->vertices[4], this->vertices[0])->normalizar();
+			Vetor* jNegativoCubo = vetorDistancia(this->vertices[0], this->vertices[4])->normalizar();
 			Vetor* kCubo = vetorDistancia(this->vertices[0], this->vertices[1])->normalizar();
-			Plano planoFrente = Plano(this->vertices[1], *kCubo);
-
-
 			Vetor* kNegativoCubo = vetorDistancia(this->vertices[1], this->vertices[0])->normalizar();
-			Plano  planoFundo = Plano(this->vertices[0], *kNegativoCubo);
 
-			vector< bool > planoAoQualPertence;
-			planoAoQualPertence.push_back(planoTopo.pertencePlano(p));
-			planoAoQualPertence.push_back(planoBase.pertencePlano(p));
-			planoAoQualPertence.push_back(planoDireito.pertencePlano(p));
-			planoAoQualPertence.push_back(planoEsquerdo.pertencePlano(p));
-			planoAoQualPertence.push_back(planoFrente.pertencePlano(p));
-			planoAoQualPertence.push_back(planoFundo.pertencePlano(p));
-
-			int idPlano = 0;
-			for (int i = 0; i < planoAoQualPertence.size(); i++) {
-				if (planoAoQualPertence[i] == true) {
-					idPlano = i;
-				}
-			}
-
-			switch (idPlano)
-			{
-			case 0:
-				return jCubo;
-				break;
-			case 1:
-				return jNegativoCubo;
-				break;
-			case 2:
-				return iCubo;
-				break;
-			case 3:
+			if (p.getX() == this->vertices[3].getX()){
+                return iCubo;
+            } else if (p.getX() == this->vertices[0].getX()) {
 				return iNegativoCubo;
-				break;
-			case 4:
-				return kCubo;
-				break;
-			case 5:
-				return kNegativoCubo;
-				break;
-			default:
-				break;
 			}
+			else if (p.getY() == this->vertices[0].getY()) {
+				return jCubo;
+			}
+			else if (p.getY() == this->vertices[7].getY()) {
+				return jNegativoCubo;
+			}
+			else if (p.getZ() == this->vertices[1].getZ()) {
+				return kCubo;
+			}
+			else if (p.getZ() == this->vertices[0].getZ()){
+                return kNegativoCubo;
+            } else {
+                cout << "WHAT THE FUCK\n";
+            }
+
         }
 
 };
@@ -1427,20 +1422,26 @@ int main(int argc, char** argv) {
  
         
     	Mundo* mundo = new Mundo(*new Vetor(0.1, 0.1, 0.1));
+
         Objeto* cilindro = new Cilindro(*new Ponto(7, -5, 0), *new Vetor(0, 1, 0), 1.0, 5.0);
         cilindro->setMaterial(new Vetor(0.58, 0.29, 0));        
 		mundo->addObjeto(cilindro);
 
 
         Objeto* cone = new Cone(*new Ponto(7, 0, 0), *new Vetor(0, 1, 0), 3.0, 5.0);
-        cone->setMaterial(new Vetor(0, 0.8, 0));
+        cone->setMaterial(new Vetor(0, 0.7999, 0));
         mundo->addObjeto(cone);
+
+
+		Objeto* cubo = new Cubo(*new Ponto(7, 0, -6), 2.0);
+		cubo->setMaterial(new Vetor(0.9, 0.9, 0.9));
+		//mundo->addObjeto(cubo);
 
 
 		mundo->addLuz(new Luz(*new Ponto(4, 1 , 4), *new Vetor(0.3, 0.3, 0.3)));
 		Observador* observador = new Observador(*new Ponto(0, -1, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
 		obsMundo = mundo->obsMundo(observador);
-		painel = new Painel(obsMundo, 2, 10, 512);
+		painel = new Painel(obsMundo, 2, 10, 1000);
 
 
 		//mundo->addObjeto(cubo1);
@@ -1497,211 +1498,211 @@ int main(int argc, char** argv) {
 
 void testes() {
 	/*
-		cout << "\n-----------Teste de Matriz------------" << endl;
-		vector<vector<double>> a = {{2, 3},
-									{1, 0},
-									{4, 5}};
+	cout << "\n-----------Teste de Matriz------------" << endl;
+	vector<vector<double>> a = {{2, 3},
+								{1, 0},
+								{4, 5}};
 
-		vector<vector<double>> b = {{3, 1},
-									{2, 4}};
+	vector<vector<double>> b = {{3, 1},
+								{2, 4}};
 
-		Matriz* A = new Matriz(a);
-		Matriz* B = new Matriz(b);
+	Matriz* A = new Matriz(a);
+	Matriz* B = new Matriz(b);
 
-		A->print();
-		cout << endl;
+	A->print();
+	cout << endl;
 
-		B->print();
-		cout << endl;
+	B->print();
+	cout << endl;
 
-		Matriz* C = A->produto(B);
+	Matriz* C = A->produto(B);
 
-		C->print(); //deve printar:
-					// 12 14
-					// 3  1
-					// 22 24
-		cout << endl;
+	C->print(); //deve printar:
+				// 12 14
+				// 3  1
+				// 22 24
+	cout << endl;
 
-		cout << "\n-----------Teste de Equação do 2° grau------------" << endl;
+	cout << "\n-----------Teste de Equação do 2° grau------------" << endl;
 
-		vector<double> raizes1 = equacaoSegundoGrau(1, 2, 1);
-		cout << "\nRaízes de x² + 2x + 1:" << endl;
-		cout << raizes1.size() << " raízes\n";
-		for(int i = 0; i < raizes1.size(); i++){
-			cout << raizes1[i] << endl;
-		}
+	vector<double> raizes1 = equacaoSegundoGrau(1, 2, 1);
+	cout << "\nRaízes de x² + 2x + 1:" << endl;
+	cout << raizes1.size() << " raízes\n";
+	for(int i = 0; i < raizes1.size(); i++){
+		cout << raizes1[i] << endl;
+	}
 
-		vector<double> raizes2 = equacaoSegundoGrau(2, 2, -1);
-		cout << "\nRaízes de 2x² + 2x - 1:" << endl;
-		cout << raizes2.size() << " raízes\n";
-		for(int i = 0; i < raizes2.size(); i++){
-			cout << raizes2[i] << endl;
-		}
+	vector<double> raizes2 = equacaoSegundoGrau(2, 2, -1);
+	cout << "\nRaízes de 2x² + 2x - 1:" << endl;
+	cout << raizes2.size() << " raízes\n";
+	for(int i = 0; i < raizes2.size(); i++){
+		cout << raizes2[i] << endl;
+	}
 
-		vector<double> raizes3 = equacaoSegundoGrau(1, 2, 0);
-		cout << "\nRaízes de x² + 2x:" << endl;
-		cout << raizes3.size() << " raízes\n";
-		for(int i = 0; i < raizes3.size(); i++){
-			cout << raizes3[i] << endl;
-		}
+	vector<double> raizes3 = equacaoSegundoGrau(1, 2, 0);
+	cout << "\nRaízes de x² + 2x:" << endl;
+	cout << raizes3.size() << " raízes\n";
+	for(int i = 0; i < raizes3.size(); i++){
+		cout << raizes3[i] << endl;
+	}
 
-		double resultado;                    //Escalar qualquer
-		Ponto *ponto1 = new Ponto(1,1,1);
-		Ponto *ponto2;
-		Ponto *ponto3 = new Ponto(3,-2, 0);
-		Vetor *vetor1 = new Vetor(1,1,1);   //Vetores para testes
-		Vetor *vetor2 = new Vetor(2,2,2);
-		Vetor *vetor3;
-		Vetor *vetor4;
-		Vetor *vetor5 = new Vetor(1,2,0);
-		Vetor *vetor6 = new Vetor(3,-2,0);
-		Vetor *vetor7 = new Vetor(0,0,1);
+	double resultado;                    //Escalar qualquer
+	Ponto *ponto1 = new Ponto(1,1,1);
+	Ponto *ponto2;
+	Ponto *ponto3 = new Ponto(3,-2, 0);
+	Vetor *vetor1 = new Vetor(1,1,1);   //Vetores para testes
+	Vetor *vetor2 = new Vetor(2,2,2);
+	Vetor *vetor3;
+	Vetor *vetor4;
+	Vetor *vetor5 = new Vetor(1,2,0);
+	Vetor *vetor6 = new Vetor(3,-2,0);
+	Vetor *vetor7 = new Vetor(0,0,1);
 
-		// **********INICIO TESTE DA CLASSE VETOR***************
+	// **********INICIO TESTE DA CLASSE VETOR***************
 
-		cout << "\n-----------Teste print------------" << endl;
-		ponto1->print();
-		ponto3->print();
-		vetor1->print();
-		vetor2->print();
+	cout << "\n-----------Teste print------------" << endl;
+	ponto1->print();
+	ponto3->print();
+	vetor1->print();
+	vetor2->print();
 
-		cout << "\n------------Teste Produto Escalar------------" << endl;
-		resultado = vetor1->produtoEscalar(*vetor2);
-		cout << resultado << endl;
+	cout << "\n------------Teste Produto Escalar------------" << endl;
+	resultado = vetor1->produtoEscalar(*vetor2);
+	cout << resultado << endl;
 
-		cout << "\n------------Teste Multiplicação por Escalar-----------" << endl;
-		vetor3 = vetor2->multEscalar(4);
-		vetor3->print();
-		vetor3 = vetor2->multEscalar(0);
-		vetor3->print();
+	cout << "\n------------Teste Multiplicação por Escalar-----------" << endl;
+	vetor3 = vetor2->multEscalar(4);
+	vetor3->print();
+	vetor3 = vetor2->multEscalar(0);
+	vetor3->print();
 
-		cout << "\n--------------Teste Cálculo da Norma------------" << endl;
-		resultado = vetor1->calcularNorma();
-		cout << "vetor1 - Norma: " << resultado << endl;
-		cout << "vetor2 - Norma: " << resultado << endl;
-
-
-		cout << "\n--------------Teste Normalizar----------" << endl;
-		vetor4 = new Vetor(4,2,8);
-		vetor4 = vetor4->normalizar();
-		vetor4->print();
-
-		cout << "\n---------------Teste do operador + --------------- " << endl;
-		*vetor3 = *vetor1 + *vetor2;
-		vetor3->print();
-
-		cout << "\n---------------Teste do operador - ----------------" << endl;
-		*vetor3 = *vetor1 - *vetor2;
-		vetor3->print();
-
-		cout << "\n---------------Teste do operador * (produto escalar)---------" << endl;
-		resultado = *vetor1 * *vetor2;
-		cout << "produto escalar: " << resultado << endl;
-
-		cout << "\n-----------Teste Produto Vetorial------------------" << endl;
-		vetor3 = vetor5->produtoVetorial(*vetor6);
-		vetor3->print();
-
-		//****************FIM TESTES DA CLASSE VETOR******************
-
-		//****************TESTES DA CLASSE RETA***********************
-		cout << "---------Teste de instanciação da reta e print------------------" << endl;
-		Reta *reta1 = new Reta(*ponto1, *vetor7);
-		reta1->print();
-
-		cout << "---------Teste do ponto atingido-------" << endl;
-		ponto2 = reta1->pontoAtingido(3);
-		ponto2->print();
-
-		//***************FIM DOS TESTES DA CLASSE RETA*******************
-
-		//***************INICIO TESTES CLASSE PLANO**********************
-		cout << "----------Teste do pertencePlano----------------" << endl;
-		Plano *meuplano = new Plano(Ponto(0, 0, 0), Vetor(0, 0, 1));
-		Ponto *ponto4 = new Ponto(1, 1, 0);
-		bool teste = meuplano->pertencePlano(*ponto4);
-		cout << teste << endl;
-
-		cout << "---------Teste da interseção raio-plano----" << endl; //Por fazer.
-
-		Vetor *meuvetor = new Vetor(0,0,-1);
-		Reta *minhareta = new Reta(Ponto(0, 0, 1),*meuvetor);
-		vector<Ponto> intersecao = meuplano->intRaio(*minhareta);
-		vector<Ponto>::iterator i;
-		for(i=intersecao.begin(); i!=intersecao.end(); i++) {
-			i->print();
-		}
-
-		cout << "---------Teste da interseçao do cilindro------" << endl;
-
-		//Criando o cilindro
-		Ponto *base = new Ponto(2,0,0);
-		Vetor *normal = new Vetor(0,1,0);
-
-		//Reta que colidirá com o cilindro
-		Ponto *pontoInicio = new Ponto(-4,1,0);
-		Vetor *direcaoReta = new Vetor(1,0,0);
-		Reta *reta2 = new Reta(*pontoInicio,*direcaoReta);
-		Cilindro *cilindro1 = new Cilindro(*base, *normal, 2, 4);
+	cout << "\n--------------Teste Cálculo da Norma------------" << endl;
+	resultado = vetor1->calcularNorma();
+	cout << "vetor1 - Norma: " << resultado << endl;
+	cout << "vetor2 - Norma: " << resultado << endl;
 
 
-		vector<Ponto> cilindroIntersecao = cilindro1->intRaio(*reta2);
-		vector<Ponto>::iterator k;
-		for(k=cilindroIntersecao.begin(); k!=cilindroIntersecao.end(); k++) {
-			k->print();
-		}
+	cout << "\n--------------Teste Normalizar----------" << endl;
+	vetor4 = new Vetor(4,2,8);
+	vetor4 = vetor4->normalizar();
+	vetor4->print();
 
-	 cout << "---------Teste de Objeto-------------------" << endl;
-		Objeto *obj1 = new Objeto();
-		Ponto *v1 = new Ponto(0, 0, 0);
-		Ponto *v2 = new Ponto(1, 0, 0);
-		Ponto *v3 = new Ponto(0, 1, 0);
-		Ponto *v4 = new Ponto(0, 0, 1);
+	cout << "\n---------------Teste do operador + --------------- " << endl;
+	*vetor3 = *vetor1 + *vetor2;
+	vetor3->print();
 
-		obj1->setVisibilidade(false);
+	cout << "\n---------------Teste do operador - ----------------" << endl;
+	*vetor3 = *vetor1 - *vetor2;
+	vetor3->print();
 
-		obj1->adicionarVertice(*v1);
-		obj1->adicionarVertice(*v2);
-		obj1->adicionarVertice(*v3);
-		obj1->adicionarVertice(*v4);
+	cout << "\n---------------Teste do operador * (produto escalar)---------" << endl;
+	resultado = *vetor1 * *vetor2;
+	cout << "produto escalar: " << resultado << endl;
 
-		obj1->adicionarAresta(*v1, *v2);
-		obj1->adicionarAresta(*v1, *v3);
-		obj1->adicionarAresta(*v1, *v4);
-		obj1->adicionarAresta(*v2, *v3);
-		obj1->adicionarAresta(*v3, *v4);
-		obj1->adicionarAresta(*v4, *v2);
+	cout << "\n-----------Teste Produto Vetorial------------------" << endl;
+	vetor3 = vetor5->produtoVetorial(*vetor6);
+	vetor3->print();
 
-		obj1->adicionarFace(*v1, *v3, *v2);
-		obj1->adicionarFace(*v1, *v3, *v4);
-		obj1->adicionarFace(*v1, *v4, *v2);
-		obj1->adicionarFace(*v2, *v3, *v4);
+	//****************FIM TESTES DA CLASSE VETOR******************
 
-		obj1->print();
+	//****************TESTES DA CLASSE RETA***********************
+	cout << "---------Teste de instanciação da reta e print------------------" << endl;
+	Reta *reta1 = new Reta(*ponto1, *vetor7);
+	reta1->print();
 
-		cout << "---------Teste de Triangulo-------------------" << endl;
-		Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
-		Reta *retaTrianguloMiss = new Reta(Ponto(0.0, -0.2, -1.0), Vetor(0.0, 0.0, -1.0));
-		vector<Ponto> intTrianguloMiss = triangulo->intRaio(*retaTrianguloMiss);
-		// triangulo->print();
+	cout << "---------Teste do ponto atingido-------" << endl;
+	ponto2 = reta1->pontoAtingido(3);
+	ponto2->print();
 
-		for(int i = 0; i < intTrianguloMiss.size(); i++){
-			intTrianguloMiss[i].print();
-		}
+	//***************FIM DOS TESTES DA CLASSE RETA*******************
 
-		Reta *retaTrianguloHit = new Reta(Ponto(0.1, 0.2, -1.0), Vetor(0.0, 0.0, -1.0));
-		vector<Ponto> intTrianguloHit = triangulo->intRaio(*retaTrianguloHit);
-		// triangulo->print();
+	//***************INICIO TESTES CLASSE PLANO**********************
+	cout << "----------Teste do pertencePlano----------------" << endl;
+	Plano *meuplano = new Plano(Ponto(0, 0, 0), Vetor(0, 0, 1));
+	Ponto *ponto4 = new Ponto(1, 1, 0);
+	bool teste = meuplano->pertencePlano(*ponto4);
+	cout << teste << endl;
 
-		for(int i = 0; i < intTrianguloHit.size(); i++){
-			intTrianguloHit[i].print();
-		}
+	cout << "---------Teste da interseção raio-plano----" << endl; //Por fazer.
+
+	Vetor *meuvetor = new Vetor(0,0,-1);
+	Reta *minhareta = new Reta(Ponto(0, 0, 1),*meuvetor);
+	vector<Ponto> intersecao = meuplano->intRaio(*minhareta);
+	vector<Ponto>::iterator i;
+	for(i=intersecao.begin(); i!=intersecao.end(); i++) {
+		i->print();
+	}
+
+	cout << "---------Teste da interseçao do cilindro------" << endl;
+
+	//Criando o cilindro
+	Ponto *base = new Ponto(2,0,0);
+	Vetor *normal = new Vetor(0,1,0);
+
+	//Reta que colidirá com o cilindro
+	Ponto *pontoInicio = new Ponto(-4,1,0);
+	Vetor *direcaoReta = new Vetor(1,0,0);
+	Reta *reta2 = new Reta(*pontoInicio,*direcaoReta);
+	Cilindro *cilindro1 = new Cilindro(*base, *normal, 2, 4);
+
+
+	vector<Ponto> cilindroIntersecao = cilindro1->intRaio(*reta2);
+	vector<Ponto>::iterator k;
+	for(k=cilindroIntersecao.begin(); k!=cilindroIntersecao.end(); k++) {
+		k->print();
+	}
+
+	cout << "---------Teste de Objeto-------------------" << endl;
+	Objeto *obj1 = new Objeto();*/
+	Ponto *v1 = new Ponto(0, 0, 0);
+	Ponto *v2 = new Ponto(1, 0, 0);
+	Ponto *v3 = new Ponto(0, 1, 0);
+	Ponto *v4 = new Ponto(0, 0, 1);
+
+	/*obj1->setVisibilidade(false);
+
+	obj1->adicionarVertice(*v1);
+	obj1->adicionarVertice(*v2);
+	obj1->adicionarVertice(*v3);
+	obj1->adicionarVertice(*v4);
+
+	obj1->adicionarAresta(*v1, *v2);
+	obj1->adicionarAresta(*v1, *v3);
+	obj1->adicionarAresta(*v1, *v4);
+	obj1->adicionarAresta(*v2, *v3);
+	obj1->adicionarAresta(*v3, *v4);
+	obj1->adicionarAresta(*v4, *v2);
+
+	obj1->adicionarFace(*v1, *v3, *v2);
+	obj1->adicionarFace(*v1, *v3, *v4);
+	obj1->adicionarFace(*v1, *v4, *v2);
+	obj1->adicionarFace(*v2, *v3, *v4);
+
+	obj1->print();
+
+	cout << "---------Teste de Triangulo-------------------" << endl;
+	Triangulo *triangulo = new Triangulo(*v1, *v2, *v3);
+	Reta *retaTrianguloMiss = new Reta(Ponto(0.0, -0.2, -1.0), Vetor(0.0, 0.0, -1.0));
+	vector<Ponto> intTrianguloMiss = triangulo->intRaio(*retaTrianguloMiss);
+	// triangulo->print();
+
+	for(int i = 0; i < intTrianguloMiss.size(); i++){
+		intTrianguloMiss[i].print();
+	}
+
+	Reta *retaTrianguloHit = new Reta(Ponto(0.1, 0.2, -1.0), Vetor(-0.2, 0.0, -1.0));
+	vector<Ponto> intTrianguloHit = triangulo->intRaio(*retaTrianguloHit);
+	triangulo->print();
+
+	for(int i = 0; i < intTrianguloHit.size(); i++){
+		intTrianguloHit[i].print();
+	}
 		*/
 
 	cout << "\n---------Teste de Cubo-------------------" << endl;
-	Cubo* cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0, Vetor(0.0, 1.0, 0.0));
+	Cubo* cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0);
 	Reta* retaCuboMiss = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
-	Reta* retaCuboHit = new Reta(Ponto(0.0, 0.0, -1.0), Vetor(0.0, 0.0, -1.0));
+	Reta* retaCuboHit = new Reta(Ponto(1.0, 0.0, -1.0), Vetor(-1.0, 0.0, -1.0));
 
 
 	cout << "CUBO" << endl;
