@@ -79,6 +79,20 @@ class Matriz {
         }
 };
 
+static class Factory {
+	public:
+	Matriz *getTranslacao(double tx, double ty, double tz) {
+		vector<vector<double>> matriz = { {} };
+		vector<double> prilin = { 1,0,0,tx };
+		vector<double> seglin = { 0,1,0,ty };
+		vector<double> terlin = { 0,0,1,tz };
+		vector<double> qualin = { 0,0,0, 1 };
+		matriz = { prilin,seglin,terlin,qualin };
+		return new Matriz(matriz);
+	}
+};
+
+
 int pontoID = 1;
 class Ponto {
     protected:
@@ -249,6 +263,11 @@ class Vetor: public Ponto {
             *diagonalSecundaria = *vetorUnitK->multEscalar(this->y * xVetor) + *vetorUnitI->multEscalar(this->z * yVetor) + *vetorUnitJ->multEscalar(this->x * zVetor);
             Vetor* resultado = new Vetor(diagonalPrincipal->getX() - diagonalSecundaria->getX(), diagonalPrincipal->getY() - diagonalSecundaria->getY(), diagonalPrincipal->getZ() - diagonalSecundaria->getZ());
             
+			delete(vetorUnitI);
+			delete(vetorUnitJ);
+			delete(vetorUnitK);
+			delete(diagonalPrincipal);
+			delete(diagonalSecundaria);
             return resultado;
         }
 };
@@ -535,6 +554,7 @@ class Objeto {
 		virtual Objeto* transforma(Observador obs)	{	return 0; }
 		virtual Vetor* getNormal(Ponto p) 			{	return 0; }
 		virtual vector<Ponto> intRaio(Reta reta)	{	return {};}
+		virtual Objeto* translate(double tx, double ty, double tz) { return 0; }
 
 };
 
@@ -548,7 +568,7 @@ class Plano : public Objeto{
     public:
         Plano(Ponto ponto, Vetor normal) {
             this->ponto = ponto;
-            this->normal = normal;
+            this->normal = *normal.normalizar();
         }
 
         Ponto* getPonto() {
@@ -580,13 +600,14 @@ class Plano : public Objeto{
                 Vetor* vetor = vetorDistancia(*reta.getPonto(),this->ponto);
                 double numerador = *vetor * this->normal;
                 double tInt = numerador/temp;
-                pontos.push_back(*reta.pontoAtingido(tInt));
+				pontos.push_back(*reta.pontoAtingido(tInt));
+
                 return pontos;
             }
         }
 
         Objeto* transforma(Observador obs){
-            return new Plano(obs.converte(ponto), *vetorDistancia(*new Ponto(0,0,0) , obs.converte(normal)));
+            return new Plano(obs.converte(ponto), obs.converteVetor(normal));
         }
 };
 
@@ -606,37 +627,51 @@ class Triangulo : public Objeto {
             this->adicionarVertice(ponto1);
             this->adicionarVertice(ponto2);
             this->adicionarVertice(ponto3);
-
+/*
             this->adicionarAresta(ponto1, ponto2);
             this->adicionarAresta(ponto2, ponto3);
             this->adicionarAresta(ponto3, ponto1);
 
-            this->adicionarFace(ponto1, ponto2, ponto3);
+            this->adicionarFace(ponto1, ponto2, ponto3);*/
         }
 
         vector<Ponto> intRaio(Reta raio) {
-
-            Vetor* p1p2 = vetorDistancia(vertices[1], vertices[0]);
-            Vetor* p1p3 = vetorDistancia(vertices[2], vertices[0]);
-            Vetor* p2p3 = vetorDistancia(vertices[2], vertices[1]);
-            Vetor* p3p1 = vetorDistancia(vertices[0], vertices[2]);
+			
+            Vetor* p1p2 = vetorDistancia(vertices[0], vertices[1]);
+            Vetor* p1p3 = vetorDistancia(vertices[0], vertices[2]);
+            Vetor* p2p3 = vetorDistancia(vertices[1], vertices[2]);
+            Vetor* p3p1 = vetorDistancia(vertices[2], vertices[0]);
             Vetor* n = p1p2->produtoVetorial(*p1p3)->normalizar();
 
+
+			
             Plano* planoTriangulo = new Plano(vertices[0], *n);
             vector<Ponto> pontoInt = planoTriangulo->intRaio(raio);
 
+
             if(pontoInt.size() == 0){
                 return pontoInt;
-            };
-
-            Vetor* p1p = vetorDistancia(pontoInt[0], vertices[0]);
-            Vetor* p2p = vetorDistancia(pontoInt[0], vertices[1]);
-            Vetor* p3p = vetorDistancia(pontoInt[0], vertices[2]);
+            }
+			
+            Vetor* p1p = vetorDistancia(vertices[0], pontoInt[0]);
+            Vetor* p2p = vetorDistancia(vertices[1], pontoInt[0]);
+            Vetor* p3p = vetorDistancia(vertices[2], pontoInt[0]);
 
             Vetor* p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
             double sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
             double sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
             double sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
+
+			free(p1p2);
+			free(p1p3);
+			free(p2p3);
+			free(p3p1);
+			free(n);
+			delete(planoTriangulo);
+			free(p1p);
+			free(p2p);
+			free(p3p);
+			free(p1p2xp1p3);
 
             if(sE >= 0 && sN >= 0 && sS >= 0){
                 return pontoInt;
@@ -644,11 +679,14 @@ class Triangulo : public Objeto {
                 pontoInt.clear();
                 return pontoInt;
             }
-        }
+			
+			return pontoInt;
+
+		}
 
         Vetor* getNormal(Ponto p){
-            Vetor* p1p2 = vetorDistancia(vertices[1], vertices[0]);
-            Vetor* p1p3 = vetorDistancia(vertices[2], vertices[0]);
+            Vetor* p1p2 = vetorDistancia(vertices[0], vertices[1]);
+            Vetor* p1p3 = vetorDistancia(vertices[0], vertices[2]);
             Vetor* normal = p1p2->produtoVetorial(*p1p3)->normalizar();
 
             return normal;
@@ -657,6 +695,24 @@ class Triangulo : public Objeto {
         Objeto* transforma(Observador obs){
             return new Triangulo(obs.converte(ponto1),obs.converte(ponto2),obs.converte(ponto3));
         }
+
+		Objeto* translate(double tx, double ty, double tz) {
+			Factory* factory = new Factory();
+			Matriz *translacao = factory->getTranslacao(tx, ty, tz);
+			Matriz* temp;
+			vector<vector<double>> p;
+			vector<Ponto> t;
+			Ponto p1;
+			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
+				p = { {(*i).getX()}, {(*i).getY()}, {(*i).getZ()}, {1}};
+				temp = translacao->produto(new Matriz(p));
+				t.push_back(*new Ponto(temp->get(0, 0), temp->get(1, 0), temp->get(2, 0)));
+			}
+
+			Objeto* triangulo = new Triangulo(t[0], t[1], t[2]);
+			triangulo->setMaterial(this->getMaterial());
+			return triangulo;
+		}
     
 };
 
@@ -706,7 +762,7 @@ class Cubo : public Objeto {
             this->adicionarVertice(*p7);
             this->adicionarVertice(*p8);
             
-            this->adicionarAresta(*p1, *p2);
+            /*this->adicionarAresta(*p1, *p2);
             this->adicionarAresta(*p2, *p3);
             this->adicionarAresta(*p3, *p4);
             this->adicionarAresta(*p4, *p1);
@@ -730,7 +786,7 @@ class Cubo : public Objeto {
             this->adicionarFace(*p3, *p7, *p8);
             this->adicionarFace(*p3, *p8, *p4);
             this->adicionarFace(*p4, *p8, *p5);
-            this->adicionarFace(*p4, *p5, *p1);
+            this->adicionarFace(*p4, *p5, *p1);*/
 
             this->triangulo1  = new Triangulo(*p1, *p2, *p3);
             this->triangulo2  = new Triangulo(*p1, *p3, *p4);
@@ -758,103 +814,86 @@ class Cubo : public Objeto {
             return this->largura;
         }
 
-        vector<Ponto> intRaio(Reta raio){
-            vector<vector<Ponto>> pontosIntRaio = {{}};
+		vector<Ponto> intRaio(Reta raio) {
+			vector<vector<Ponto>> pontosIntRaio = { {} };
 
-            pontosIntRaio.push_back(this->triangulo1->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo2->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo3->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo4->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo5->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo6->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo7->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo8->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo9->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo10->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo11->intRaio(raio));
-            pontosIntRaio.push_back(this->triangulo12->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo1->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo2->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo3->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo4->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo5->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo6->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo7->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo8->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo9->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo10->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo11->intRaio(raio));
+			pontosIntRaio.push_back(this->triangulo12->intRaio(raio));
 
-            vector<Ponto> pontosIntRaioMeio;
-            for(int i = 0; i < pontosIntRaio.size(); i++){
-                if(pontosIntRaio[i].size() > 0){
-                    pontosIntRaioMeio.push_back(pontosIntRaio[i][0]);
-                }
-            }
+			vector<Ponto> pontosIntRaioMeio;
+			for (int i = 0; i < pontosIntRaio.size(); i++) {
+				if (pontosIntRaio[i].size() > 0) {
+					pontosIntRaioMeio.push_back(pontosIntRaio[i][0]);
+				}
+			}
 
-			vector<Ponto> pontosIntRaioFim;		// Checagem do caso em que o ponto de interseção passa pela diagonal da face do cubo, retornando, erroneamente, dois pontos de interseção (1 ponto para cada triangulo daquela face)
-			if (pontosIntRaioMeio.size() == 4) {
-				pontosIntRaioFim.push_back(pontosIntRaioMeio[0]);
-				pontosIntRaioFim.push_back(pontosIntRaioMeio[2]);
+			vector<Ponto> pontosIntRaioFim;    // Checagem do caso em que o ponto de interseção retorna, erroneamente, pontos repetidos
+			bool repetido = false;
+
+			if (pontosIntRaioMeio.size() > 1) {
+				for (int i = 0; i < pontosIntRaioMeio.size(); i++) {
+					for (int j = 0; j < pontosIntRaioFim.size(); j++) {
+						repetido = false;
+						if (pontosIntRaioMeio[i].igual(&pontosIntRaioFim[j])) {
+							repetido = true;
+						}
+					}
+
+					if (repetido == false) {
+						pontosIntRaioFim.push_back(pontosIntRaioMeio[i]);
+					}
+				}
 
 				return pontosIntRaioFim;
 			}
 
 			return pontosIntRaioMeio;
-        }
+		}
         
         Objeto* transforma(Observador obs){
             return new Cubo(obs.converte(centro), largura, *vetorDistancia(*new Ponto(0,0,0) , obs.converte(direcao)));
         }
 
         Vetor* getNormal(Ponto p){
-			Vetor* jCubo = vetorDistancia(this->vertices[4], this->vertices[0])->normalizar();
-			Plano planoTopo = Plano(this->vertices[0], *jCubo);
-
-			Vetor* jNegativoCubo = vetorDistancia(this->vertices[0], this->vertices[4])->normalizar();
-			Plano planoBase = Plano(this->vertices[7], *jNegativoCubo);
-
 			Vetor* iCubo = vetorDistancia(this->vertices[0], this->vertices[3])->normalizar();
-			Plano planoDireito = Plano(this->vertices[3], *iCubo);
-
-
 			Vetor* iNegativoCubo = vetorDistancia(this->vertices[3], this->vertices[0])->normalizar();
-			Plano  planoEsquerdo = Plano(this->vertices[0], *iNegativoCubo);
-
+			Vetor* jCubo = vetorDistancia(this->vertices[4], this->vertices[0])->normalizar();
+			Vetor* jNegativoCubo = vetorDistancia(this->vertices[0], this->vertices[4])->normalizar();
 			Vetor* kCubo = vetorDistancia(this->vertices[0], this->vertices[1])->normalizar();
-			Plano planoFrente = Plano(this->vertices[1], *kCubo);
-
-
 			Vetor* kNegativoCubo = vetorDistancia(this->vertices[1], this->vertices[0])->normalizar();
-			Plano  planoFundo = Plano(this->vertices[0], *kNegativoCubo);
 
-			vector< bool > planoAoQualPertence;
-			planoAoQualPertence.push_back(planoTopo.pertencePlano(p));
-			planoAoQualPertence.push_back(planoBase.pertencePlano(p));
-			planoAoQualPertence.push_back(planoDireito.pertencePlano(p));
-			planoAoQualPertence.push_back(planoEsquerdo.pertencePlano(p));
-			planoAoQualPertence.push_back(planoFrente.pertencePlano(p));
-			planoAoQualPertence.push_back(planoFundo.pertencePlano(p));
-
-			int idPlano = 0;
-			for (int i = 0; i < planoAoQualPertence.size(); i++) {
-				if (planoAoQualPertence[i] == true) {
-					idPlano = i;
-				}
-			}
-
-			switch (idPlano)
-			{
-			case 0:
-				return jCubo;
-				break;
-			case 1:
-				return jNegativoCubo;
-				break;
-			case 2:
+			if (p.getX() == this->vertices[3].getX()) {
 				return iCubo;
-				break;
-			case 3:
-				return iNegativoCubo;
-				break;
-			case 4:
-				return kCubo;
-				break;
-			case 5:
-				return kNegativoCubo;
-				break;
-			default:
-				break;
 			}
+			else if (p.getX() == this->vertices[0].getX()) {
+				return iNegativoCubo;
+			}
+			else if (p.getY() == this->vertices[0].getY()) {
+				return jCubo;
+			}
+			else if (p.getY() == this->vertices[7].getY()) {
+				return jNegativoCubo;
+			}
+			else if (p.getZ() == this->vertices[1].getZ()) {
+				return kCubo;
+			}
+			else if (p.getZ() == this->vertices[0].getZ()) {
+				return kNegativoCubo;
+			}
+			else {
+				cout << "WHAT THE FUCK\n";
+			}
+
         }
 
 };
@@ -891,21 +930,22 @@ class Esfera : public Objeto {  //TODO Testar
         }
 
         vector<Ponto> intRaio(Reta raio){
-            Vetor* vetorAux = vetorDistancia(this->getCentro(),*raio.getPonto());
+			Vetor* vetorAux = vetorDistancia(this->getCentro(),*raio.getPonto());
             double a = raio.getVetor()->produtoEscalar(*raio.getVetor());
             double b = vetorAux->produtoEscalar(*raio.getVetor());
             double c = vetorAux->produtoEscalar(*vetorAux) - this->getRaio()*this->getRaio();
 
             vector<double> tIntersecao = equacaoSegundoGrau(a, 2*b, c);
             vector<Ponto> pontos;
-            pontos.push_back(*raio.pontoAtingido(tIntersecao[0]));
-            pontos.push_back(*raio.pontoAtingido(tIntersecao[1]));
+			for (vector<double>::iterator i = tIntersecao.begin(); i != tIntersecao.end(); i++) {
+				pontos.push_back(*raio.pontoAtingido(*i));
+			}
 
             return pontos;
         }
 
         Vetor* getNormal(Ponto p){
-            Vetor* normal = vetorDistancia(p, this->centro)->normalizar();
+            Vetor* normal = vetorDistancia(this->centro,p)->normalizar();
             return normal;
         }
 
@@ -1052,6 +1092,7 @@ class Cone : public Objeto {
         }
 
         vector<Ponto> intRaio(Reta reta) {
+
             vector<Ponto> pontosAtingidos;
             //vetor v
             Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
@@ -1088,7 +1129,7 @@ class Cone : public Objeto {
         Vetor* getNormal(Ponto p){
             Vetor* Nc = &this->normal; //vetor normal na base do cone
             Ponto* V = &this->vertice; //ponto do vértice do cone
-            Vetor* Vg = vetorDistancia(*V, p); //vetor do ponto pInt(p) até o vértice do cone, ou seja, vetor paralelo à geratriz do cone
+            Vetor* Vg = vetorDistancia(p, *V); //vetor do ponto pInt(p) até o vértice do cone, ou seja, vetor paralelo à geratriz do cone
             Vetor* Vt = Nc->produtoVetorial(*Vg); //vetor tangente ao cone no ponto pInt(p)
             Vetor* normal = Vt->produtoVetorial(*Vg); //vetor perpendicular à geratriz do cone
 
@@ -1120,6 +1161,7 @@ class Luz{
 
         Luz* transforma(Observador obs){
             return new Luz(obs.converte(posicao), intensidade);
+			//return this;
         }
 
 };
@@ -1204,12 +1246,14 @@ class Pixel{
             this->reta = new Reta( obs, *vetorDistancia(obs, center));
             this->obs = obs;
             vector<Objeto*> objetos = (*obsMundo).getObjetos();
+			vector<Ponto> pontos_intersec;
+			vector<double> t_intersec;
+
             
             for(vector<Objeto*>::iterator i=objetos.begin(); i != objetos.end(); i++){ 
                 if((*i)->getVisibilidade() == true){
 
-                    vector<Ponto> pontos_intersec = (*i)->intRaio( *reta );
-                    vector<double> t_intersec;
+                    pontos_intersec = (*i)->intRaio( *reta );
 
 
                     for (vector<Ponto>::iterator it_pontos = pontos_intersec.begin(); it_pontos != pontos_intersec.end(); it_pontos++)
@@ -1255,7 +1299,7 @@ class Pixel{
                         if(fd < 0) fd = 0;
 
 
-				
+						
                         Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2)->normalizar();
                         double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), obs)).normalizar() * r;
                         if(fs < 0) fs = 0;
@@ -1265,6 +1309,7 @@ class Pixel{
                         *Is = *Is +  *((*it_luzes)->getIntensidade().elemMult(*solutions.front().second->getMaterial()).multEscalar(fs));  
                         
                     }
+					delete(test);
                 }
             
                 Ia = Ia+*Id+*Is;
@@ -1297,6 +1342,7 @@ class Painel{
 					Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
 
 					linhas.push_back(pixel->getCor());
+					delete(pixel);
 					//linhas.insert(linhas.begin(), pixel->getCor());
                 }
 				//mtrx.push_back(linhas);
@@ -1385,11 +1431,18 @@ void mouse(int button, int state, int x, int y)
 			else cout << "None" << endl;
 			
 			
-			if (p1->getSolutions().size() != 0 && p2->getSolutions().size() != 0 && p1->getSolutions().front().second->getId() == p2->getSolutions().front().second->getId()) {
+			/*
+			if (p1->getSolutions().size() != 0) {
 				Ponto inicio = *p1->getReta()->pontoAtingido(p1->getSolutions().front().first);
 				Ponto fim = *p2->getReta()->pontoAtingido(p1->getSolutions().front().first);
 				Vetor eixo = *vetorDistancia(inicio, fim);
+
+				obsMundo->addObjeto(p1->getSolutions().front().second->translate(eixo.getX(), eixo.getY(), eixo.getZ()));
+				painel = new Painel(obsMundo, 2, 10, 512);
+
 			}
+			*/
+
 		}
 
 		
@@ -1413,8 +1466,55 @@ void resize(int w, int h) {
 
 void testes();
 
+class Retangulo : public Objeto{
+public:
+	double n;
+	double m;
+	Ponto ponto;
+	Vetor normal;
+public:
+	Retangulo(double n, double m, Ponto ponto, Vetor normal){
+		this->n = n/2;
+		this->m = m/2;
+		this->ponto = ponto;
+		this->normal = normal;
+
+		this->adicionarVertice(Ponto(ponto.getX() + this->n, ponto.getY() + this->m, ponto.getZ()));
+		this->adicionarVertice(Ponto(ponto.getX() + this->n, ponto.getY() - this->m, ponto.getZ()));
+		this->adicionarVertice(Ponto(ponto.getX() - this->n, ponto.getY() + this->m, ponto.getZ()));
+		this->adicionarVertice(Ponto(ponto.getX() - this->n, ponto.getY() - this->m, ponto.getZ()));
+	}
+
+	vector<Ponto> intRaio(Reta reta) {
+		Plano *pl = new Plano(ponto, normal);
+		vector<Ponto> intpl = pl->intRaio(reta);
+		vector<Ponto> pontos;
+		if (intpl.size() > 0) {
+			Vetor aux = *vetorDistancia(ponto, intpl[0]);
+			if (aux.getX() < n && aux.getY() < m && aux.getX() > -n && aux.getY() > -m)
+				pontos.push_back(intpl[0]);
+		}
+
+		return pontos;
+	}
+
+	Vetor* getNormal(Ponto p) {
+		return &normal;
+	}
+
+	Objeto* transforma(Observador obs) {
+		return new Retangulo(n, m, obs.converte(ponto), obs.converteVetor(normal));
+
+	}
+
+
+
+};
+
 // Main.
 int main(int argc, char** argv) {
+
+
 
     bool teste = false;  // altere para alternar entre rodar testes e renderizar o cenário
 
@@ -1431,42 +1531,49 @@ int main(int argc, char** argv) {
         cilindro->setMaterial(new Vetor(0.58, 0.29, 0));        
 		mundo->addObjeto(cilindro);
 
-
         Objeto* cone = new Cone(*new Ponto(7, 0, 0), *new Vetor(0, 1, 0), 3.0, 5.0);
         cone->setMaterial(new Vetor(0, 0.8, 0));
         mundo->addObjeto(cone);
 
+		Objeto* retangulo = new Retangulo(50,50,*new Ponto(10, -5, -3), *new Vetor(0, 1, 0));
+		retangulo->setMaterial(new Vetor(1, 1, 1));
+		//mundo->addObjeto(retangulo); 
 
-		mundo->addLuz(new Luz(*new Ponto(4, 1 , 4), *new Vetor(0.3, 0.3, 0.3)));
-		Observador* observador = new Observador(*new Ponto(0, -1, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
+		Objeto* esfera = new Esfera(*new Ponto(7, -3, -4), 2);
+		esfera->setMaterial(new Vetor(0.3, 0.3, 0.7));
+		mundo->addObjeto(esfera);
+		
+		Objeto* triangulo = new Triangulo(*new Ponto(7, 0, 0), *new Ponto(7, 0, 5), *new Ponto(7, 5, 0));
+		triangulo->setMaterial(new Vetor(0, 1, 0));
+		//mundo->addObjeto(triangulo);
+
+		mundo->addLuz(new Luz(*new Ponto(1, 5, 2), *new Vetor(0.3, 0.3, 0.3)));
+		Observador* observador = new Observador(*new Ponto(0, 2, 0), *new Ponto(7, -5, 0), *new Ponto(0, 10, 0));
 		obsMundo = mundo->obsMundo(observador);
 		painel = new Painel(obsMundo, 2, 10, 512);
+		
+		
+		/*
+		Mundo* mundo = new Mundo(*new Vetor(0.1, 0.1, 0.1));
+		Objeto* triangulo = new Triangulo(*new Ponto(7, 0, 0), *new Ponto(7, 0, 5), *new Ponto(7, 5, 0));
+		triangulo->setMaterial(new Vetor(0, 1, 0)); 
+		mundo->addObjeto(triangulo);
 
+		Objeto* triangulo2 = new Triangulo(*new Ponto(5, 0, 0), *new Ponto(7, 5, 0), *new Ponto(5, 1, 3));
+		triangulo2->setMaterial(new Vetor(0, 1, 0));
+		mundo->addObjeto(triangulo2);
 
-		//mundo->addObjeto(cubo1);
-
-
-        /*
-        Objeto* esfera1 = new Esfera(*new Ponto(7, 5, 2), 1);
-        esfera1->setMaterial(new Vetor(0, 0.8, 0));
-        mundo->addObjeto(esfera1);
-        
-
-        
-        Objeto* esfera2 = new Esfera(*new Ponto(7, 5, -2), 1);
-        esfera2->setMaterial(new Vetor(0, 0.8, 0));
-        mundo->addObjeto(esfera2);
-        
-        
-        Objeto* plano = new Plano(*new Ponto(0, 0, 0), *new Vetor(0, 1, 0));
-        plano->setMaterial(new Vetor(0, 0, 0));
-        mundo->addObjeto(plano);
-        */
+		mundo->addLuz(new Luz(*new Ponto(1, 5, 2), *new Vetor(0.3, 0.3, 0.3)));
+		Observador* observador = new Observador(*new Ponto(0, 0, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
+		obsMundo = mundo->obsMundo(observador);
+		painel = new Painel(obsMundo, 2, 10, 512);
+	
+	*/
 
 
 
         
-
+		
         // Create API window
         RenderAPI::StartRenderAPI(argc, argv, width, height);
         
@@ -1488,6 +1595,7 @@ int main(int argc, char** argv) {
         //if i'm here is because the render loop was stopped and i'm exiting the application
         //delete the pixel buffer
         RenderAPI::DeleteVBO(&vbo);
+		
     }
 }
 
@@ -1496,6 +1604,25 @@ int main(int argc, char** argv) {
 
 
 void testes() {
+
+	vector<Ponto> p;
+	p.push_back(*new Ponto(0, 0, 0));
+	p.push_back(*new Ponto(1, 0, 0));
+	p.push_back(*new Ponto(2, 0, 0));
+
+	for (auto i = p.begin(); i != p.end(); i++) {
+		(*i).print();
+	}
+	
+	for (vector<Ponto>::iterator i = p.begin();i != p.end();i++) {
+		p.erase(i);
+		p.push_back(*new Ponto(1, 1, 1));
+	}
+
+	for (auto i = p.begin(); i != p.end(); i++) {
+		(*i).print();
+	}
+
 	/*
 		cout << "\n-----------Teste de Matriz------------" << endl;
 		vector<vector<double>> a = {{2, 3},
@@ -1701,7 +1828,7 @@ void testes() {
 	cout << "\n---------Teste de Cubo-------------------" << endl;
 	Cubo* cubo = new Cubo(Ponto(0.0, 0.0, 0.0), 2.0, Vetor(0.0, 1.0, 0.0));
 	Reta* retaCuboMiss = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
-	Reta* retaCuboHit = new Reta(Ponto(0.0, 0.0, -1.0), Vetor(0.0, 0.0, -1.0));
+	Reta* retaCuboHit = new Reta(Ponto(1.0, 0.0, -1.0), Vetor(-1.0, 0.0, -1.0));
 
 
 	cout << "CUBO" << endl;
