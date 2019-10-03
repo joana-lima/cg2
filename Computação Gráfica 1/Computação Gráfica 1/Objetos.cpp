@@ -10,7 +10,7 @@ using namespace std;
 
 class Matriz {
     protected:
-        vector<vector<double>> matriz = {};
+        vector<vector<float>> matriz = {};
         int linhas;
         int colunas;
 
@@ -19,8 +19,8 @@ class Matriz {
             this->linhas = nLinhas;
             this->colunas = nColunas;
 
-            vector<double> linhas;
-            vector<vector<double>> linhasComColunas;
+            vector<float> linhas;
+            vector<vector<float>> linhasComColunas;
 
             for(int i = 0; i < nLinhas; i++){
                 for(int j = 0; j < nColunas; j++){
@@ -34,17 +34,17 @@ class Matriz {
             this->matriz = linhasComColunas;
         }
 
-        Matriz(vector<vector<double>> matriz){
+        Matriz(vector<vector<float>> matriz){
             this->matriz = matriz;
             this->linhas = matriz.size();
             this->colunas = matriz[0].size();
         }
 
-        void inserirValor(int linha, int coluna, double valor){
+        void inserirValor(int linha, int coluna, float valor){
             this->matriz[linha, coluna] = {valor};
         }
 
-        double get(int i, int j){
+        float get(int i, int j){
             return matriz[i][j];
         }
 
@@ -81,12 +81,12 @@ class Matriz {
 
 static class Factory {
 	public:
-	Matriz *getTranslacao(double tx, double ty, double tz) {
-		vector<vector<double>> matriz = { {} };
-		vector<double> prilin = { 1,0,0,tx };
-		vector<double> seglin = { 0,1,0,ty };
-		vector<double> terlin = { 0,0,1,tz };
-		vector<double> qualin = { 0,0,0, 1 };
+	Matriz *getTranslacao(float tx, float ty, float tz) {
+		vector<vector<float>> matriz = { {} };
+		vector<float> prilin = { 1,0,0,tx };
+		vector<float> seglin = { 0,1,0,ty };
+		vector<float> terlin = { 0,0,1,tz };
+		vector<float> qualin = { 0,0,0, 1 };
 		matriz = { prilin,seglin,terlin,qualin };
 		return new Matriz(matriz);
 	}
@@ -97,9 +97,9 @@ int pontoID = 1;
 class Ponto {
     protected:
 		int id;
-        double x;
-        double y;
-        double z;
+        float x;
+        float y;
+        float z;
 
     public:
         Ponto() {
@@ -110,7 +110,7 @@ class Ponto {
 			pontoID++;
         }
         
-        Ponto(double x, double y, double z) {
+        Ponto(float x, float y, float z) {
             this->x = x;
             this->y = y;
             this->z = z;
@@ -122,27 +122,27 @@ class Ponto {
             return this->id;
         }
 
-        double getX() {
+        float getX() {
             return this->x;
         }
 
-        double getY() {
+        float getY() {
             return this->y;
         }
 
-        double getZ() {
+        float getZ() {
             return this->z;
         }
 
-        void setX(double x) {
+        void setX(float x) {
             this->x = x;
         }
 
-        void setY(double y) {
+        void setY(float y) {
             this->y = y;
         }
 
-        void setZ(double z) {
+        void setZ(float z) {
             this->z = z;
         }
 
@@ -179,7 +179,7 @@ class Vetor: public Ponto {
 			vetorID++;
 		}
 
-        Vetor(double x, double y, double z) {
+        Vetor(float x, float y, float z) {
 			this->x = x;
 			this->y = y;
 			this->z = z;
@@ -187,14 +187,14 @@ class Vetor: public Ponto {
 			vetorID++;
 		}
 
-        double produtoEscalar(Vetor vetor) {
-            double resultado;
+        float produtoEscalar(Vetor vetor) {
+            float resultado;
             resultado = (this->x*vetor.getX()) + (this->y*vetor.getY()) + (this->z*vetor.getZ());
             return resultado;
         }
 
-        Vetor* multEscalar(double escalar) {  //Multiplicaçao de um vetor por um escalar
-            double novoX, novoY, novoZ;
+        Vetor* multEscalar(float escalar) {  //Multiplicaçao de um vetor por um escalar
+            float novoX, novoY, novoZ;
             novoX = this->x * escalar;
             novoY = this->y * escalar;
             novoZ = this->z * escalar;
@@ -202,13 +202,13 @@ class Vetor: public Ponto {
             return resultado;
         }
 
-        double calcularNorma() {
-            double norma = sqrt(this->produtoEscalar(*this));
+        float calcularNorma() {
+            float norma = sqrt(this->produtoEscalar(*this));
             return norma;
         }
 
         Vetor* normalizar() {
-            double norma = this->calcularNorma();
+            float norma = this->calcularNorma();
             Vetor* novoVetor = this->multEscalar(1/norma);
             return novoVetor;
         }
@@ -241,8 +241,8 @@ class Vetor: public Ponto {
             return res;
         }
 
-        double operator * (Vetor const &obj) {
-            double resultado;
+        float operator * (Vetor const &obj) {
+            float resultado;
             resultado = x*obj.x + y*obj.y + z*obj.z;
             return resultado;
         }
@@ -252,9 +252,9 @@ class Vetor: public Ponto {
             Vetor* vetorUnitJ = new Vetor(0.0, 1.0, 0.0);
             Vetor* vetorUnitK = new Vetor(0.0, 0.0, 1.0);
 
-            double xVetor = vetor.getX();
-            double yVetor = vetor.getY();
-            double zVetor = vetor.getZ();
+            float xVetor = vetor.getX();
+            float yVetor = vetor.getY();
+            float zVetor = vetor.getZ();
 
             Vetor* diagonalPrincipal = new Vetor;
             *diagonalPrincipal = *vetorUnitI->multEscalar(this->y * zVetor) + *vetorUnitJ->multEscalar(this->z * xVetor) + *vetorUnitK->multEscalar(this->x * yVetor);
@@ -272,7 +272,7 @@ class Vetor: public Ponto {
 };
 
 Ponto* somaPontoVetor(Ponto ponto, Vetor vetor) {
-    double x, y, z;
+    float x, y, z;
     x = ponto.getX() + vetor.getX();
     y = ponto.getY() + vetor.getY();
     z = ponto.getZ() + vetor.getZ();
@@ -282,17 +282,17 @@ Ponto* somaPontoVetor(Ponto ponto, Vetor vetor) {
 
 Vetor* vetorDistancia(Ponto p1, Ponto p2) {     //(p2 - p1) Vetor que vai de p1 à p2
     Vetor* distancia;
-    double x = p2.getX() - p1.getX();
-    double y = p2.getY() - p1.getY();
-    double z = p2.getZ() - p1.getZ();
+    float x = p2.getX() - p1.getX();
+    float y = p2.getY() - p1.getY();
+    float z = p2.getZ() - p1.getZ();
     distancia = new Vetor(x,y,z);
     return distancia;
 }
 
-vector<double> equacaoSegundoGrau(double a, double b, double c) {
-    double delta = (b*b) - (4*a*c);
-    double x1, x2;
-    vector<double> escalares;
+vector<float> equacaoSegundoGrau(float a, float b, float c) {
+    float delta = (b*b) - (4*a*c);
+    float x1, x2;
+    vector<float> escalares;
 
     if(delta < 0)
         return escalares;
@@ -311,10 +311,10 @@ vector<double> equacaoSegundoGrau(double a, double b, double c) {
 
 class Quaternio {
     public:
-        double x;    // vetor do eixo de rotação, que passa pela origem
-        double y;
-        double z;
-        double w; // angulo da rotação ao redor do eixo
+        float x;    // vetor do eixo de rotação, que passa pela origem
+        float y;
+        float z;
+        float w; // angulo da rotação ao redor do eixo
 
         Quaternio(){    // Quaternio neutro
             x = 0;
@@ -323,7 +323,7 @@ class Quaternio {
             w = 1;
         }
 
-        Quaternio(Vetor *v, double wA){
+        Quaternio(Vetor *v, float wA){
             x = v->getX();
             y = v->getY();
             z = v->getZ();
@@ -331,7 +331,7 @@ class Quaternio {
         }
 
         void normalizar(){
-            double magnitude = sqrt(x*x + y*y + z*z + w*w);
+            float magnitude = sqrt(x*x + y*y + z*z + w*w);
             x /= magnitude;
             y = magnitude;
             z /= magnitude;
@@ -351,7 +351,7 @@ class Quaternio {
         }
 
         Matriz* rotacao(){
-            vector< vector< double >> m = {{w*w + x*x - y*y - z*z, 2*x*y - 2*w*y, 2*x*z + 2*w*y, 0},
+            vector< vector< float >> m = {{w*w + x*x - y*y - z*z, 2*x*y - 2*w*y, 2*x*z + 2*w*y, 0},
                                            {2*x*y + 2*w*z, w*w - x*x + y*y - z*z, 2*y*z + 2*w*x, 0},
                                            {2*x*z - 2*w*y, 2*y*z - 2*w*x, w*w - x*x - y*y + z*z, 0},
                                            {0            , 0           , 0                     , 1}};
@@ -383,7 +383,7 @@ class Reta {
             vetor.print();
         }
 
-        Ponto* pontoAtingido(double k) {
+        Ponto* pontoAtingido(float k) {
             Ponto* atingido = somaPontoVetor(this->ponto, *(this->vetor.multEscalar(k)));
             return atingido;
         }
@@ -406,16 +406,16 @@ class Observador{
             Vetor j = this->getJ();
             Vetor k = this->getK();
 
-            double a = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * i);
-            double b = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * j);
-            double c = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * k);
+            float a = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * i);
+            float b = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * j);
+            float c = - (*vetorDistancia(*new Ponto(0,0,0),posicao) * k);
 
-            vector<double> primeiraLinha = {i.getX(), i.getY(), i.getZ(), a};
-            vector<double> segundalinha  = {j.getX(), j.getY(), j.getZ(), b};
-            vector<double> terceiraLinha = {k.getX(), k.getY(), k.getZ(), c};
-            vector<double> quartalinha	 = {0       , 0       , 0       , 1};
+            vector<float> primeiraLinha = {i.getX(), i.getY(), i.getZ(), a};
+            vector<float> segundalinha  = {j.getX(), j.getY(), j.getZ(), b};
+            vector<float> terceiraLinha = {k.getX(), k.getY(), k.getZ(), c};
+            vector<float> quartalinha	 = {0       , 0       , 0       , 1};
 
-            vector<vector<double>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
+            vector<vector<float>> matrizDeTransformacao = {primeiraLinha, segundalinha, terceiraLinha, quartalinha};
             this->matriz = new Matriz(matrizDeTransformacao);
         }
 
@@ -437,13 +437,13 @@ class Observador{
 
 
         Ponto converte(Ponto ponto){
-            vector<vector<double>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
+            vector<vector<float>> pontoAtransformar =  {{ponto.getX()}, {ponto.getY()}, {ponto.getZ()}, {1}};
             Matriz* resultado = matriz->produto(new Matriz(pontoAtransformar));
             return *new Ponto(resultado->get(0,0), resultado->get(1,0), resultado->get(2,0));
         }
 
 		Vetor converteVetor(Vetor vet) {
-			vector<vector<double>> vetorAtransformar = { {vet.getX()}, {vet.getY()}, {vet.getZ()}, {0} };
+			vector<vector<float>> vetorAtransformar = { {vet.getX()}, {vet.getY()}, {vet.getZ()}, {0} };
 			Matriz* resultado = matriz->produto(new Matriz(vetorAtransformar));
 			return *new Vetor(resultado->get(0, 0), resultado->get(1, 0), resultado->get(2, 0));
 		}
@@ -553,7 +553,7 @@ class Objeto {
 		virtual Objeto* transforma(Observador obs)	{	return 0; }
 		virtual Vetor* getNormal(Ponto p) 			{	return 0; }
 		virtual vector<Ponto> intRaio(Reta reta)	{	return {};}
-		virtual Objeto* translate(double tx, double ty, double tz) { return 0; }
+		virtual Objeto* translate(float tx, float ty, float tz) { return 0; }
 
 };
 
@@ -584,21 +584,21 @@ class Plano : public Objeto{
 
         bool pertencePlano(Ponto ponto) {
             Vetor* distancia = vetorDistancia(this->ponto, ponto);
-            double resultado = *distancia * (this->normal);
+            float resultado = *distancia * (this->normal);
             if(resultado == 0)      return true;
             else                    return false;   
         }
 
         vector<Ponto> intRaio(Reta reta) {
             vector<Ponto> pontos;
-            double temp = this->normal * (*reta.getVetor());
+            float temp = this->normal * (*reta.getVetor());
             if(temp == 0) {
                 return pontos;
             }
             else {
                 Vetor* vetor = vetorDistancia(*reta.getPonto(),this->ponto);
-                double numerador = *vetor * this->normal;
-                double tInt = numerador/temp;
+                float numerador = *vetor * this->normal;
+                float tInt = numerador/temp;
 				pontos.push_back(*reta.pontoAtingido(tInt));
 
                 return pontos;
@@ -657,9 +657,9 @@ class Triangulo : public Objeto {
             Vetor* p3p = vetorDistancia(vertices[2], pontoInt[0]);
 
 			Vetor* p1p2xp1p3 = p1p2->produtoVetorial(*p1p3);
-			double sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
-			double sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
-			double sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
+			float sE = p1p2->produtoVetorial(*p1p)->produtoEscalar(*p1p2xp1p3);
+			float sN = p2p3->produtoVetorial(*p2p)->produtoEscalar(*p1p2xp1p3);
+			float sS = p3p1->produtoVetorial(*p3p)->produtoEscalar(*p1p2xp1p3);
 
 			free(p1p2);
 			free(p1p3);
@@ -695,11 +695,11 @@ class Triangulo : public Objeto {
             return new Triangulo(obs.converte(ponto1),obs.converte(ponto2),obs.converte(ponto3));
         }
 
-		Objeto* translate(double tx, double ty, double tz) {
+		Objeto* translate(float tx, float ty, float tz) {
 			Factory* factory = new Factory();
 			Matriz *translacao = factory->getTranslacao(tx, ty, tz);
 			Matriz* temp;
-			vector<vector<double>> p;
+			vector<vector<float>> p;
 			vector<Ponto> t;
 			Ponto p1;
 			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
@@ -741,7 +741,7 @@ class Cubo : public Objeto {
             this->centro = centro;
             this->largura = largura;
 
-            double ml = largura/2;  //Meia Largura: ml
+            float ml = largura/2;  //Meia Largura: ml
             Ponto* p1 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() - ml);
             Ponto* p2 = new Ponto(this->centro.getX() - ml, this->centro.getY() + ml, this->centro.getZ() + ml);
             Ponto* p3 = new Ponto(this->centro.getX() + ml, this->centro.getY() + ml, this->centro.getZ() + ml);
@@ -808,7 +808,7 @@ class Cubo : public Objeto {
             return this->direcao;
         }
 
-        double getLargura(){
+        float getLargura(){
             return this->largura;
         }
 
@@ -900,10 +900,10 @@ class Cubo : public Objeto {
 class Esfera : public Objeto {  //TODO Testar
     protected:
         Ponto centro;
-        double raio;
+        float raio;
 
     public:
-        Esfera(Ponto centro, double raio){
+        Esfera(Ponto centro, float raio){
             this->centro = centro;
             this->raio = raio;
         }
@@ -912,13 +912,13 @@ class Esfera : public Objeto {  //TODO Testar
             return this->centro;
         }
 
-        double getRaio(){
+        float getRaio(){
             return this->raio;
         }
 
         bool pontoPertence(Ponto p){
             Vetor* vetor = vetorDistancia(p, centro);
-            double norma = vetor->calcularNorma();
+            float norma = vetor->calcularNorma();
             norma *= norma;
 
             if(norma == (this->raio * this->raio)){
@@ -930,13 +930,13 @@ class Esfera : public Objeto {  //TODO Testar
 
         vector<Ponto> intRaio(Reta raio){
 			Vetor* vetorAux = vetorDistancia(this->getCentro(),*raio.getPonto());
-            double a = raio.getVetor()->produtoEscalar(*raio.getVetor());
-            double b = vetorAux->produtoEscalar(*raio.getVetor());
-            double c = vetorAux->produtoEscalar(*vetorAux) - this->getRaio()*this->getRaio();
+            float a = raio.getVetor()->produtoEscalar(*raio.getVetor());
+            float b = vetorAux->produtoEscalar(*raio.getVetor());
+            float c = vetorAux->produtoEscalar(*vetorAux) - this->getRaio()*this->getRaio();
 
-            vector<double> tIntersecao = equacaoSegundoGrau(a, 2*b, c);
+            vector<float> tIntersecao = equacaoSegundoGrau(a, 2*b, c);
             vector<Ponto> pontos;
-			for (vector<double>::iterator i = tIntersecao.begin(); i != tIntersecao.end(); i++) {
+			for (vector<float>::iterator i = tIntersecao.begin(); i != tIntersecao.end(); i++) {
 				pontos.push_back(*raio.pontoAtingido(*i));
 			}
 
@@ -957,11 +957,11 @@ class Cilindro : public Objeto{
     protected:
         Ponto base;
         Vetor normal;
-        double raio;
-        double altura;
+        float raio;
+        float altura;
 
     public:
-        Cilindro(Ponto base, Vetor normal, double raio, double altura) {
+        Cilindro(Ponto base, Vetor normal, float raio, float altura) {
             this->base = base;
             this->normal = *normal.normalizar();
             this->raio = raio;
@@ -976,11 +976,11 @@ class Cilindro : public Objeto{
             return &this->normal;
         }
 
-        double getRaio() {
+        float getRaio() {
             return this->raio;
         }
 
-        double getAltura() {
+        float getAltura() {
             return this->altura;
         }
 
@@ -993,28 +993,28 @@ class Cilindro : public Objeto{
 
             //Vetor v
             Vetor* bPo = vetorDistancia(this->base,*reta.getPonto()); //(Po - B)
-            double aux = (*bPo * this->normal);                       //(Po - B).u  
+            float aux = (*bPo * this->normal);                       //(Po - B).u  
             Vetor* vetorAux = this->normal.multEscalar(aux);          //((Po - B).u).u
             Vetor v = *bPo - *vetorAux;                               //Vetor v
 
             //Vetor w
-            double meuEscalar = *reta.getVetor() * this->normal;
+            float meuEscalar = *reta.getVetor() * this->normal;
             vetorAux = this->normal.multEscalar(meuEscalar);
             Vetor w = *reta.getVetor() -  *vetorAux;
 
             //Cálculo dos coeficientes da equação do segundo grau.
-            double a = w * w;
-            double b = v * w;
-            double c = v * v - this->raio * this->raio;
+            float a = w * w;
+            float b = v * w;
+            float c = v * v - this->raio * this->raio;
 
-            vector<double> escalares = equacaoSegundoGrau(a,2*b,c);
+            vector<float> escalares = equacaoSegundoGrau(a,2*b,c);
 
             //Obtendo vectora de pontos Atingidos
-            vector<double>::iterator i;
+            vector<float>::iterator i;
             aux = 0;
             Ponto p;
             Vetor bP;
-            double meuTeste;
+            float meuTeste;
             for(i=escalares.begin(); i != escalares.end(); i++) {
                 //Testando validade dos pontos.
                 p = *reta.pontoAtingido(*i);
@@ -1054,11 +1054,11 @@ class Cone : public Objeto {
         Ponto base;
         Ponto vertice;
         Vetor normal;
-        double raio;
-        double altura;
+        float raio;
+        float altura;
 
     public:
-        Cone(Ponto base, Vetor normal, double raio, double altura) {
+        Cone(Ponto base, Vetor normal, float raio, float altura) {
             this->base = base;
             this->normal = *normal.normalizar();
             this->raio = raio;
@@ -1074,11 +1074,11 @@ class Cone : public Objeto {
             return &this->normal;
         }
 
-        double getRaio() {
+        float getRaio() {
             return this->raio;
         }
 
-        double getAltura() {
+        float getAltura() {
             return this->altura;
         }
 
@@ -1086,7 +1086,7 @@ class Cone : public Objeto {
             return this->vertice;
         }
 
-        double getCossenoGeratriz() {
+        float getCossenoGeratriz() {
             return this->altura / sqrt(pow(this->altura,2) + pow(this->raio,2));
         }
 
@@ -1097,17 +1097,17 @@ class Cone : public Objeto {
             Vetor v = *vetorDistancia(*reta.getPonto(), this->vertice);
         
             //Cálculo dos coeficientes da equaçao do segundo grau
-            double a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal)) - ((*reta.getVetor() * *reta.getVetor())* pow(this->getCossenoGeratriz(), 2));
-            double b = (v * *reta.getVetor()) * pow(this->getCossenoGeratriz(),2) - 
+            float a = ((*reta.getVetor() * this->normal) * (*reta.getVetor() * this->normal)) - ((*reta.getVetor() * *reta.getVetor())* pow(this->getCossenoGeratriz(), 2));
+            float b = (v * *reta.getVetor()) * pow(this->getCossenoGeratriz(),2) - 
                     (v * this->normal) * (*reta.getVetor() * this->normal);
-            double c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
+            float c = pow(v * this->normal,2) - (v * v) * pow(this->getCossenoGeratriz(),2);
 
             //Achando os escalares da intersecao.
-            vector<double> escalares = equacaoSegundoGrau(a,2*b,c);
+            vector<float> escalares = equacaoSegundoGrau(a,2*b,c);
 
-            vector<double>::iterator i;
+            vector<float>::iterator i;
             Ponto p;
-            double teste;
+            float teste;
             for(i=escalares.begin(); i != escalares.end(); i++) {
                 //Testando validade dos pontos.
                 p = *reta.pontoAtingido(*i);
@@ -1225,13 +1225,13 @@ class Mundo{
 
 };
 
-bool compare(pair<double, Objeto*> a,  pair<double, Objeto*> b){
+bool compare(pair<float, Objeto*> a,  pair<float, Objeto*> b){
     return a.first < b.first;
 }
 
 class Pixel{
     private:   
-	    vector<pair <double, Objeto*> > solutions;
+	    vector<pair <float, Objeto*> > solutions;
 	    Reta* reta;
 	    Mundo* obsMundo;
 	    Ponto obs;
@@ -1246,7 +1246,7 @@ class Pixel{
             this->obs = obs;
             vector<Objeto*> objetos = (*obsMundo).getObjetos();
 			vector<Ponto> pontos_intersec;
-			vector<double> t_intersec;
+			vector<float> t_intersec;
 
             
             for(vector<Objeto*>::iterator i=objetos.begin(); i != objetos.end(); i++){ 
@@ -1260,7 +1260,7 @@ class Pixel{
 
                         
 
-                    for (vector<double>::iterator t = t_intersec.begin(); t != t_intersec.end(); t++)
+                    for (vector<float>::iterator t = t_intersec.begin(); t != t_intersec.end(); t++)
                         if((*t)>0) solutions.push_back( make_pair((*t),(*i)) ); 
                                    
                     }
@@ -1271,7 +1271,7 @@ class Pixel{
         }
 
 
-        vector<pair <double, Objeto*> > getSolutions(){
+        vector<pair <float, Objeto*> > getSolutions(){
             return solutions;
         }
 
@@ -1294,13 +1294,13 @@ class Pixel{
 
                         Vetor normal = *solutions.front().second->getNormal(*(*reta).pontoAtingido(solutions.front().first))->normalizar();
                         Vetor l = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), *(*it_luzes)->getPosicao())).normalizar();
-                        double fd = normal * l;
+                        float fd = normal * l;
                         if(fd < 0) fd = 0;
 
 
 						
                         Vetor r = l - *(*normal.multEscalar(normal*l)-l).multEscalar(2)->normalizar();
-                        double fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), obs)).normalizar() * r;
+                        float fs = *(*vetorDistancia(*(*reta).pontoAtingido(solutions.front().first), obs)).normalizar() * r;
                         if(fs < 0) fs = 0;
 
 
@@ -1321,14 +1321,14 @@ class Pixel{
 
 class Painel{
     private:
-        double distancia;
-        double lado;
+        float distancia;
+        float lado;
         int pixels;
         Mundo* obsMundo;
         vector<vector<Cor>> mtrx;
 
     public:
-        Painel(Mundo* obsMundo, double distancia, double lado, int pixels){
+        Painel(Mundo* obsMundo, float distancia, float lado, int pixels){
             this->obsMundo = obsMundo;
             this->distancia = distancia;
             this->lado = lado;
@@ -1356,10 +1356,10 @@ class Painel{
         }
 
         Ponto* getCenter(int i, int j){
-            double delx = lado/pixels, dely = lado/pixels;
-            double x = -lado/2 + delx/2 + j*delx;
-            double y = lado/2 - dely/2 - i*dely;
-            double z = -distancia;
+            float delx = lado/pixels, dely = lado/pixels;
+            float x = -lado/2 + delx/2 + j*delx;
+            float y = lado/2 - dely/2 - i*dely;
+            float z = -distancia;
             return new Ponto(x,y,z);
         }
 
@@ -1467,12 +1467,12 @@ void testes();
 
 class Retangulo : public Objeto{
 public:
-	double n;
-	double m;
+	float n;
+	float m;
 	Ponto ponto;
 	Vetor normal;
 public:
-	Retangulo(double n, double m, Ponto ponto, Vetor normal){
+	Retangulo(float n, float m, Ponto ponto, Vetor normal){
 		this->n = n/2;
 		this->m = m/2;
 		this->ponto = ponto;
@@ -1632,11 +1632,11 @@ void testes() {
 
 	/*
 	cout << "\n-----------Teste de Matriz------------" << endl;
-	vector<vector<double>> a = {{2, 3},
+	vector<vector<float>> a = {{2, 3},
 								{1, 0},
 								{4, 5}};
 
-	vector<vector<double>> b = {{3, 1},
+	vector<vector<float>> b = {{3, 1},
 								{2, 4}};
 
 	Matriz* A = new Matriz(a);
@@ -1658,28 +1658,28 @@ void testes() {
 
 	cout << "\n-----------Teste de Equação do 2° grau------------" << endl;
 
-	vector<double> raizes1 = equacaoSegundoGrau(1, 2, 1);
+	vector<float> raizes1 = equacaoSegundoGrau(1, 2, 1);
 	cout << "\nRaízes de x² + 2x + 1:" << endl;
 	cout << raizes1.size() << " raízes\n";
 	for(int i = 0; i < raizes1.size(); i++){
 		cout << raizes1[i] << endl;
 	}
 
-	vector<double> raizes2 = equacaoSegundoGrau(2, 2, -1);
+	vector<float> raizes2 = equacaoSegundoGrau(2, 2, -1);
 	cout << "\nRaízes de 2x² + 2x - 1:" << endl;
 	cout << raizes2.size() << " raízes\n";
 	for(int i = 0; i < raizes2.size(); i++){
 		cout << raizes2[i] << endl;
 	}
 
-	vector<double> raizes3 = equacaoSegundoGrau(1, 2, 0);
+	vector<float> raizes3 = equacaoSegundoGrau(1, 2, 0);
 	cout << "\nRaízes de x² + 2x:" << endl;
 	cout << raizes3.size() << " raízes\n";
 	for(int i = 0; i < raizes3.size(); i++){
 		cout << raizes3[i] << endl;
 	}
 
-	double resultado;                    //Escalar qualquer
+	float resultado;                    //Escalar qualquer
 	Ponto *ponto1 = new Ponto(1,1,1);
 	Ponto *ponto2;
 	Ponto *ponto3 = new Ponto(3,-2, 0);
@@ -1885,7 +1885,7 @@ void testes() {
 	Reta *reta = new Reta(Ponto(2.0, 2.0, -1.0), Vetor(0.0, 0.0, -1.0));
 
 
-	vector<pair<double, A*>> as;
+	vector<pair<float, A*>> as;
 	A* a = new B();
 	a->setNumber(10);
 	as.push_back(make_pair(1, a));
