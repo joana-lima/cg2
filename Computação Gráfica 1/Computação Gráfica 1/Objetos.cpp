@@ -1515,7 +1515,7 @@ int main(int argc, char** argv) {
 
 
 
-    bool teste = false;  // altere para alternar entre rodar testes e renderizar o cenário
+    bool teste = true;  // altere para alternar entre rodar testes e renderizar o cenário
 
     if(teste){
         
@@ -1554,8 +1554,6 @@ int main(int argc, char** argv) {
 		mundo->addLuz(new Luz(*new Ponto(1, 5, 2), *new Vetor(0.3, 0.3, 0.3)));
 		Observador* observador = new Observador(*new Ponto(0, 2, 0), *new Ponto(7, -5, 0), *new Ponto(0, 10, 0));
 
-		mundo->addLuz(new Luz(*new Ponto(4, 1 , 4), *new Vetor(0.3, 0.3, 0.3)));
-		Observador* observador = new Observador(*new Ponto(0, -1, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
 		obsMundo = mundo->obsMundo(observador);
 		painel = new Painel(obsMundo, 2, 10, 512);
 		
