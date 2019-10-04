@@ -77,19 +77,66 @@ class Matriz {
                 return C;
             }
         }
-};
 
-static class Factory {
-	public:
-	Matriz *getTranslacao(float tx, float ty, float tz) {
-		vector<vector<float>> matriz = { {} };
-		vector<float> prilin = { 1,0,0,tx };
-		vector<float> seglin = { 0,1,0,ty };
-		vector<float> terlin = { 0,0,1,tz };
-		vector<float> qualin = { 0,0,0, 1 };
-		matriz = { prilin,seglin,terlin,qualin };
-		return new Matriz(matriz);
-	}
+		Matriz transpose() {
+			vector<vector<float>> v;
+			vector<float> linha;
+			for (int i = 0; i < this->matriz.size(); i++) {
+				for (int j = 0; j < this->matriz[0].size(); j++) {
+					linha.push_back(matriz[j][i]);
+				}
+				v.push_back(linha);
+				linha.clear();
+			}
+			return *new Matriz(v);
+		}
+
+		Matriz operator + (Matriz const& obj) {
+			vector<vector<float>> v;
+			vector<float> linha;
+			for (int i = 0; i < this->matriz.size(); i++) {
+				for (int j = 0; j < this->matriz[0].size(); j++) {
+					linha.push_back(matriz[i][j] + obj.matriz[i][j]);
+				}
+				v.push_back(linha);
+				linha.clear();
+			}
+			return *new Matriz(v);
+		}
+
+		Matriz operator - (Matriz const& obj) {
+			vector<vector<float>> v;
+			vector<float> linha;
+			for (int i = 0; i < this->matriz.size(); i++) {
+				for (int j = 0; j < this->matriz[0].size(); j++) {
+					linha.push_back(matriz[i][j] - obj.matriz[i][j]);
+				}
+				v.push_back(linha);
+				linha.clear();
+			}
+			return *new Matriz(v);
+		}
+
+		Matriz mult(float obj) {
+			vector<vector<float>> v;
+			vector<float> linha;
+			for (int i = 0; i < this->matriz.size(); i++) {
+				for (int j = 0; j < this->matriz[0].size(); j++) {
+					linha.push_back(matriz[i][j] * obj);
+				}
+				v.push_back(linha);
+				linha.clear();
+			}
+			return *new Matriz(v);
+		}
+
+		Matriz* fourdtranspose() {
+			vector<float> linha;
+			for (int i = 0; i < matriz.size(); i++)
+				linha.push_back(matriz[i][0]);
+
+			return new Matriz({ linha });
+		}
 };
 
 
@@ -166,6 +213,10 @@ class Ponto {
         void print() {
             cout << "Ponto " << this->id << " (X:" << this->x <<"; Y:" << this->y << "; Z:" << this->z << ")" << endl;
         }
+
+		virtual Matriz* parseMatriz() {
+			return new Matriz({ {x},{y},{z},{1} });
+		}
 };
 
 int vetorID = 1;
@@ -269,6 +320,10 @@ class Vetor: public Ponto {
 			delete(diagonalSecundaria);
             return resultado;
         }
+
+		Matriz* parseMatriz() {
+			return new Matriz({ {x},{y},{z},{0} });
+		}
 };
 
 Ponto* somaPontoVetor(Ponto ponto, Vetor vetor) {
@@ -553,7 +608,8 @@ class Objeto {
 		virtual Objeto* transforma(Observador obs)	{	return 0; }
 		virtual Vetor* getNormal(Ponto p) 			{	return 0; }
 		virtual vector<Ponto> intRaio(Reta reta)	{	return {};}
-		virtual Objeto* translate(float tx, float ty, float tz) { return 0; }
+		virtual Objeto* translate(Vetor v) { return 0; }
+		virtual Objeto* espelha(Ponto p, Vetor normal) { return 0; }
 
 };
 
@@ -600,8 +656,8 @@ class Plano : public Objeto{
                 float numerador = *vetor * this->normal;
                 float tInt = numerador/temp;
 				pontos.push_back(*reta.pontoAtingido(tInt));
-
-                return pontos;
+                
+				return pontos;
             }
         }
 
@@ -609,6 +665,45 @@ class Plano : public Objeto{
             return new Plano(obs.converte(ponto), obs.converteVetor(normal));
         }
 };
+
+Matriz* getIdentidade() {
+	vector<vector<float>> matriz = { {} };
+	vector<float> prilin = { 1,0,0,0 };
+	vector<float> seglin = { 0,1,0,0 };
+	vector<float> terlin = { 0,0,1,0 };
+	vector<float> qualin = { 0,0,0,1 };
+
+	matriz = { prilin,seglin,terlin,qualin };
+	return new Matriz(matriz);
+}
+Matriz* getTranslacao(Vetor t) {
+	vector<vector<float>> matriz = { {} };
+	vector<float> prilin = { 1,0,0,t.getX() };
+	vector<float> seglin = { 0,1,0,t.getY() };
+	vector<float> terlin = { 0,0,1,t.getZ() };
+	vector<float> qualin = { 0,0,0, 1 };
+	matriz = { prilin,seglin,terlin,qualin };
+	return new Matriz(matriz);
+}
+
+Matriz* getEscala(Vetor t) {
+	vector<vector<float>> matriz = { {} };
+	vector<float> prilin = { t.getX(),0,0,0 };
+	vector<float> seglin = { 0,t.getY(),0,0 };
+	vector<float> terlin = { 0,0,t.getZ(),0 };
+	vector<float> qualin = { 0,0,0, 1 };
+	matriz = { prilin,seglin,terlin,qualin };
+	return new Matriz(matriz);
+}
+
+
+Matriz getEspelhamento(Plano pl) {
+	Matriz* iden = getIdentidade();
+	Matriz* normal = pl.getNormal()->parseMatriz();
+	Matriz H = *iden - normal->produto(normal->fourdtranspose())->mult(2);
+
+	return H;
+}
 
 class Triangulo : public Objeto {
     public:
@@ -694,24 +789,38 @@ class Triangulo : public Objeto {
         Objeto* transforma(Observador obs){
             return new Triangulo(obs.converte(ponto1),obs.converte(ponto2),obs.converte(ponto3));
         }
-
-		Objeto* translate(float tx, float ty, float tz) {
-			Factory* factory = new Factory();
-			Matriz *translacao = factory->getTranslacao(tx, ty, tz);
-			Matriz* temp;
-			vector<vector<float>> p;
-			vector<Ponto> t;
-			Ponto p1;
+		
+		Objeto* translate(Vetor t) {
+			Matriz *translacao = getTranslacao(t);
+			translacao->print();
+			Matriz *prod;
+			vector<Ponto> novos_pontos;
 			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
-				p = { {(*i).getX()}, {(*i).getY()}, {(*i).getZ()}, {1}};
-				temp = translacao->produto(new Matriz(p));
-				t.push_back(*new Ponto(temp->get(0, 0), temp->get(1, 0), temp->get(2, 0)));
+				prod = translacao->produto(i->parseMatriz());
+				novos_pontos.push_back(*new Ponto(prod->get(0, 0), prod->get(1, 0), prod->get(2, 0)));
 			}
 
-			Objeto* triangulo = new Triangulo(t[0], t[1], t[2]);
+			Objeto* triangulo = new Triangulo(novos_pontos[0], novos_pontos[1], novos_pontos[2]);
 			triangulo->setMaterial(this->getMaterial());
 			return triangulo;
 		}
+
+		Objeto* espelha(Ponto p, Vetor normal) {
+			Vetor *pnormal = normal.normalizar();
+			Matriz translacao = getEspelhamento(*new Plano(p,*pnormal ));
+			Matriz* prod;
+			vector<Ponto> novos_pontos;
+			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+				prod = translacao.produto(i->parseMatriz());
+				novos_pontos.push_back(*new Ponto(prod->get(0, 0), prod->get(1, 0), prod->get(2, 0)));
+			}
+
+			Objeto* triangulo = new Triangulo(novos_pontos[0], novos_pontos[1], novos_pontos[2]);
+			triangulo->setMaterial(this->getMaterial());
+			return triangulo;
+		}
+
+
     
 };
 
@@ -1177,6 +1286,14 @@ class Mundo{
             this->luz_ambiente = luz_ambiente;
         }
 
+		~Mundo() {
+			objetos.clear();
+			luzes.clear();
+			objetos.shrink_to_fit();
+			luzes.shrink_to_fit();
+			delete observador;
+		}
+
         void addObjeto(Objeto* obj){
             objetos.push_back(obj);
         }
@@ -1269,6 +1386,13 @@ class Pixel{
 
             sort(solutions.begin(), solutions.end(), compare);
         }
+		
+		~Pixel() {
+			delete reta;
+			delete obsMundo;
+			solutions.clear();
+			solutions.shrink_to_fit();
+		}
 
 
         vector<pair <float, Objeto*> > getSolutions(){
@@ -1308,7 +1432,7 @@ class Pixel{
                         *Is = *Is +  *((*it_luzes)->getIntensidade().elemMult(*solutions.front().second->getMaterial()).multEscalar(fs));  
                         
                     }
-					delete(test);
+					//delete(test);
                 }
             
                 Ia = Ia+*Id+*Is;
@@ -1341,7 +1465,7 @@ class Painel{
 					Pixel* pixel = new Pixel(*getCenter(i,j), *new Ponto(0,0,0), obsMundo);
 
 					linhas.push_back(pixel->getCor());
-					delete(pixel);
+					//delete(pixel);
 					//linhas.insert(linhas.begin(), pixel->getCor());
                 }
 				//mtrx.push_back(linhas);
@@ -1350,6 +1474,16 @@ class Painel{
             }
 
         }
+
+		~Painel() {
+			delete obsMundo;
+			for (auto i : mtrx) {
+				i.clear();
+				i.shrink_to_fit();
+			}
+			mtrx.clear();
+			mtrx.shrink_to_fit();
+		}
 
         vector<vector<Cor>> getMatrix(){
             return mtrx;
@@ -1430,17 +1564,28 @@ void mouse(int button, int state, int x, int y)
 			else cout << "None" << endl;
 			
 			
-			/*
-			if (p1->getSolutions().size() != 0) {
+			
+			if (p1->getSolutions().size() != 0 && p2->getSolutions().size() != 0 && p2->getSolutions().front().second->getId() == p1->getSolutions().front().second->getId()) {
 				Ponto inicio = *p1->getReta()->pontoAtingido(p1->getSolutions().front().first);
-				Ponto fim = *p2->getReta()->pontoAtingido(p1->getSolutions().front().first);
+				Ponto fim = *p2->getReta()->pontoAtingido(p2->getSolutions().front().first);
 				Vetor eixo = *vetorDistancia(inicio, fim);
+				
+		
+				Objeto* res = p1->getSolutions().front().second;
+				res = res->translate(*vetorDistancia(inicio, Ponto(0,0,0))); 
+				res = res->espelha(inicio, eixo);
+				res = res->translate(*vetorDistancia(*new Ponto(0, 0, 0), inicio));
 
-				obsMundo->addObjeto(p1->getSolutions().front().second->translate(eixo.getX(), eixo.getY(), eixo.getZ()));
+
+
+				obsMundo->addObjeto(res);
+
+				cout << "Rendering..";
 				painel = new Painel(obsMundo, 2, 10, 512);
+				cout << "\nRender over";
 
 			}
-			*/
+			
 
 		}
 
@@ -1515,7 +1660,7 @@ int main(int argc, char** argv) {
 
 
 
-    bool teste = true;  // altere para alternar entre rodar testes e renderizar o cenário
+    bool teste = false;  // altere para alternar entre rodar testes e renderizar o cenário
 
     if(teste){
         
@@ -1529,30 +1674,31 @@ int main(int argc, char** argv) {
 
         Objeto* cilindro = new Cilindro(*new Ponto(7, -5, 0), *new Vetor(0, 1, 0), 1.0, 5.0);
         cilindro->setMaterial(new Vetor(0.58, 0.29, 0));        
-		mundo->addObjeto(cilindro);
+		//mundo->addObjeto(cilindro);
 
         Objeto* cone = new Cone(*new Ponto(7, 0, 0), *new Vetor(0, 1, 0), 3.0, 5.0);
         cone->setMaterial(new Vetor(0, 0.8, 0));
-        mundo->addObjeto(cone);
+        //mundo->addObjeto(cone);
 
-		Objeto* retangulo = new Retangulo(50,50,*new Ponto(10, -5, -3), *new Vetor(0, 1, 0));
-		retangulo->setMaterial(new Vetor(1, 1, 1));
+		//Objeto* retangulo = new Retangulo(50,50,*new Ponto(10, -5, -3), *new Vetor(0, 1, 0));
+		//retangulo->setMaterial(new Vetor(1, 1, 1));
 		//mundo->addObjeto(retangulo); 
 
 		Objeto* esfera = new Esfera(*new Ponto(7, -3, -4), 2);
 		esfera->setMaterial(new Vetor(0.3, 0.3, 0.7));
-		mundo->addObjeto(esfera);
+		//mundo->addObjeto(esfera);
 		
 		Objeto* triangulo = new Triangulo(*new Ponto(7, 0, 0), *new Ponto(7, 0, 5), *new Ponto(7, 5, 0));
 		triangulo->setMaterial(new Vetor(0, 1, 0));
-		//mundo->addObjeto(triangulo);
+		mundo->addObjeto(triangulo);
 	
-		Objeto* cubo = new Cubo(*new Ponto(7, 0, -6), 2.0);
-		cubo->setMaterial(new Vetor(0.9, 0.9, 0.9));
+		//Objeto* cubo = new Cubo(*new Ponto(7, 0, -6), 2.0);
+		//cubo->setMaterial(new Vetor(0.9, 0.9, 0.9));
 		//mundo->addObjeto(cubo);
 
 		mundo->addLuz(new Luz(*new Ponto(1, 5, 2), *new Vetor(0.3, 0.3, 0.3)));
-		Observador* observador = new Observador(*new Ponto(0, 2, 0), *new Ponto(7, -5, 0), *new Ponto(0, 10, 0));
+		//Observador* observador = new Observador(*new Ponto(0, 2, 0), *new Ponto(7, -5, 0), *new Ponto(0, 10, 0));
+		Observador* observador = new Observador(*new Ponto(0, 0, 0), *new Ponto(7, 0, 0), *new Ponto(0, 10, 0));
 
 		obsMundo = mundo->obsMundo(observador);
 		painel = new Painel(obsMundo, 2, 10, 512);
@@ -1610,23 +1756,21 @@ int main(int argc, char** argv) {
 
 void testes() {
 
-	vector<Ponto> p;
-	p.push_back(*new Ponto(0, 0, 0));
-	p.push_back(*new Ponto(1, 0, 0));
-	p.push_back(*new Ponto(2, 0, 0));
+	vector<vector<float>> p = { {1},{2},{3},{4} };
+	Matriz* p_m = new Matriz(p);
+	p_m->print();
 
-	for (auto i = p.begin(); i != p.end(); i++) {
-		(*i).print();
-	}
-	
-	for (vector<Ponto>::iterator i = p.begin();i != p.end();i++) {
-		p.erase(i);
-		p.push_back(*new Ponto(1, 1, 1));
-	}
+	vector<vector<float>> p2 = { {10},{20},{30},{40} };
+	Matriz* p_m2 = new Matriz(p2);
+	p_m2->print();
 
-	for (auto i = p.begin(); i != p.end(); i++) {
-		(*i).print();
-	}
+
+	(*p_m + *p_m2).print();
+	(*p_m2 - *p_m).print();
+	(p_m->mult(2)).print();
+	p_m->fourdtranspose()->print();
+
+
 
 	/*
 	cout << "\n-----------Teste de Matriz------------" << endl;

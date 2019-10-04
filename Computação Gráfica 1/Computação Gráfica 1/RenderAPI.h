@@ -84,12 +84,18 @@ namespace RenderAPI{
 	}
 
 	inline void setView(int width, int height) {
+		//if (height == 0) height = 1;
 		glViewport(0, 0, width, height);
 		
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
+		
 		gluOrtho2D(0.0, width, 0.0, height);
+		/*if (width <= height)
+			gluOrtho2D(0.0f, 250.0f, 0.0f, 250.0f * height / width);
+		else
+			gluOrtho2D(0.0f, 250.0f * width / height, 0.0f, 250.0f);*/
 	}
 
 
