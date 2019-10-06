@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
+#define PI 3.14159265
+
 
 using namespace std;
 
@@ -405,12 +407,7 @@ class Quaternio {
             return qOut;
         }
 
-        Matriz* rotacao(){
-            vector< vector< float >> m = {{w*w + x*x - y*y - z*z, 2*x*y - 2*w*y, 2*x*z + 2*w*y, 0},
-                                           {2*x*y + 2*w*z, w*w - x*x + y*y - z*z, 2*y*z + 2*w*x, 0},
-                                           {2*x*z - 2*w*y, 2*y*z - 2*w*x, w*w - x*x - y*y + z*z, 0},
-                                           {0            , 0           , 0                     , 1}};
-        }
+ 
 };
 
 class Reta {
@@ -610,6 +607,7 @@ class Objeto {
 		virtual vector<Ponto> intRaio(Reta reta)	{	return {};}
 		virtual Objeto* translate(Vetor v) { return 0; }
 		virtual Objeto* espelha(Ponto p, Vetor normal) { return 0; }
+		virtual Objeto* rotaciona(float c, Vetor v) { return 0; }
 
 };
 
@@ -705,6 +703,19 @@ Matriz getEspelhamento(Plano pl) {
 	return H;
 }
 
+Matriz* getRotacao(float angle, Vetor eixo) {
+	Quaternio* q = new Quaternio(eixo.normalizar()->multEscalar(sin(angle*PI/360)), cos(angle * PI / 360));
+
+	vector<vector<float>> mr = { {q->w, q->z,-q->y,0},{-q->z,q->w,q->x,0},{q->y,-q->x,q->w,0},{-q->x,-q->y,-q->z,0} };
+	vector<vector<float>> ml = { {q->w, q->z,-q->y,-q->x},{-q->z,q->w,q->x,-q->y},{q->y,-q->x,q->w,-q->z},{-q->x,-q->y,-q->z,q->w} };
+	
+	Matriz* a = new Matriz(ml);
+	Matriz* b = new Matriz(mr);
+
+	return a->produto(b);
+
+}
+
 class Triangulo : public Objeto {
     public:
         Ponto ponto1;
@@ -792,7 +803,6 @@ class Triangulo : public Objeto {
 		
 		Objeto* translate(Vetor t) {
 			Matriz *translacao = getTranslacao(t);
-			translacao->print();
 			Matriz *prod;
 			vector<Ponto> novos_pontos;
 			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++){
@@ -812,6 +822,20 @@ class Triangulo : public Objeto {
 			vector<Ponto> novos_pontos;
 			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++) {
 				prod = translacao.produto(i->parseMatriz());
+				novos_pontos.push_back(*new Ponto(prod->get(0, 0), prod->get(1, 0), prod->get(2, 0)));
+			}
+
+			Objeto* triangulo = new Triangulo(novos_pontos[0], novos_pontos[1], novos_pontos[2]);
+			triangulo->setMaterial(this->getMaterial());
+			return triangulo;
+		}
+
+		Objeto* rotaciona(float angle, Vetor eixo) {
+			Matriz* rotacao = getRotacao(angle, eixo);
+			Matriz* prod;
+			vector<Ponto> novos_pontos;
+			for (vector<Ponto>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+				prod = rotacao->produto(i->parseMatriz());
 				novos_pontos.push_back(*new Ponto(prod->get(0, 0), prod->get(1, 0), prod->get(2, 0)));
 			}
 
@@ -1570,12 +1594,20 @@ void mouse(int button, int state, int x, int y)
 				Ponto fim = *p2->getReta()->pontoAtingido(p2->getSolutions().front().first);
 				Vetor eixo = *vetorDistancia(inicio, fim);
 				
-		
+		/*
 				Objeto* res = p1->getSolutions().front().second;
 				res = res->translate(*vetorDistancia(inicio, Ponto(0,0,0))); 
 				res = res->espelha(inicio, eixo);
 				res = res->translate(*vetorDistancia(*new Ponto(0, 0, 0), inicio));
 
+				res->print();
+
+				obsMundo->addObjeto(res);
+		*/
+				Objeto* res = p1->getSolutions().front().second;
+				res = res->translate(*vetorDistancia(inicio, Ponto(0, 0, 0)));
+				res = res->rotaciona(60, *vetorDistancia(inicio, Ponto(0, 0, 0)));
+				res = res->translate(*vetorDistancia(*new Ponto(0, 0, 0), inicio));
 
 
 				obsMundo->addObjeto(res);
